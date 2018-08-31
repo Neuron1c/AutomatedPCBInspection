@@ -27,10 +27,10 @@ def cropArea(img, rect):
     return img_crop
 
 
-widthMin = 50
-heightMin = 50
+widthMin = 300
+heightMin = 300
 
-img = cv2.imread('test.png')
+img = cv2.imread('test3.jpg')
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -54,27 +54,5 @@ box = np.int0(box)
 # cv2.drawContours(img,[box],0,(0,0,255),10)
 
 img = cropArea(img, rectangle)
-
-# hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-# h,s,v = cv2.split(hsv)
-
-# lower = np.array([200, 200, 100], dtype = "uint8")
-# upper = np.array([255, 255, 150], dtype = "uint8")
-# mask = cv2.inRange(img, lower, upper)
-# img1 = cv2.bitwise_and(img, img, mask = mask)
-
-# RGB_img = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
-# plt.imshow(RGB_img)
-# plt.show()
-
-
-# lower = np.array([20, 15, 210], dtype = "uint8")
-# upper = np.array([50, 45, 255], dtype = "uint8")
-# mask = cv2.inRange(img, lower, upper)
-# img2 = cv2.bitwise_and(img, img, mask = mask)
-
-# RGB_img = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-# plt.imshow(RGB_img)
-# plt.show()
 
 rotation.getRotation(img)
