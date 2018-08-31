@@ -30,11 +30,11 @@ def cropArea(img, rect):
 widthMin = 300
 heightMin = 300
 
-img = cv2.imread('test3.jpg')
+img = cv2.imread('test5.jpg')
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-ret, thresh = cv2.threshold(gray, 110, 255, cv2.THRESH_BINARY_INV)
+ret, thresh = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY_INV)
 image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
 
@@ -55,4 +55,12 @@ box = np.int0(box)
 
 img = cropArea(img, rectangle)
 
-rotation.getRotation(img)
+x = rotation.getRotation(img)
+
+for i in range(x):
+    img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+print(x)
+img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+plt.imshow(img)
+plt.show()
