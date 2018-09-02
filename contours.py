@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import rotation
+import locateComponents
 from matplotlib import pyplot as plt
 
 def totuple(a):
@@ -55,12 +56,15 @@ box = np.int0(box)
 
 img = cropArea(img, rectangle)
 
-x = rotation.getRotation(img)
+x, originX, originY = rotation.getRotation(img)
 
 for i in range(x):
     img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-print(x)
+x, originX, originY = rotation.getRotation(img)
+
+img = locateComponents.locate(img, originX, originY)
+
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 plt.imshow(img)
 plt.show()
