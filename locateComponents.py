@@ -1,7 +1,6 @@
 import csv
 import cv2
 import numpy as np
-import contours
 from matplotlib import pyplot as plt
 
 def componentDimensions(componentCode):
@@ -52,6 +51,7 @@ def locate(img, originX, originY):
                 y =  int(originY - np.round(float(row[3])*ratio))
                 
                 if(float(row[4]) == 90 or float(row[4]) == 270):
+
                     corner1x = int(x - np.round(compWidth*ratio))
                     corner1y = int(y - np.round(compHeight*ratio))
                     
@@ -67,8 +67,6 @@ def locate(img, originX, originY):
                     corner2y = int(y + np.round(compWidth*ratio))
                     
                 
-                # rectangle = ((corner1x,corner1y), (corner2x,corner2y), 0)
-
                 rectangle = img[corner1y:corner2y,corner1x:corner2x]
                 
                 

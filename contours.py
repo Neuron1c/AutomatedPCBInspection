@@ -65,6 +65,7 @@ def main():
 
     imgList = locateComponents.locate(img, originX, originY)
     i = 0
+
     for img in imgList:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         plt.figure(i)
@@ -72,4 +73,6 @@ def main():
         i = i + 1
     
     # cv2.waitkey(0)
-    plt.show()  
+    plt.show()
+
+main()  
