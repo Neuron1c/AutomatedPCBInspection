@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
-def getRotation(img):
+def getRotation(img, printCircle):
 
     # LIGHT BLUE
     lower = np.array([150, 150, 50], dtype = "uint8")
@@ -26,14 +26,14 @@ def getRotation(img):
 
     circles = np.hstack((circle1,circle2,circle3))
 
-    # if circles is not None:
-    #     circles = np.uint16(np.around(circles))
+    if circles is not None and printCircle == 1:
+        circles = np.uint16(np.around(circles))
         
-    #     for i in circles[0,:]:
-    #         # draw the outer circle
-    #         cv2.circle(img,(i[0],i[1]),i[2],(0,255,0),2)
-    #         # draw the center of the circle
-    #         cv2.circle(img,(i[0],i[1]),2,(0,0,255),3)
+        for i in circles[0,:]:
+            # draw the outer circle
+            cv2.circle(img,(i[0],i[1]),i[2],(0,255,0),2)
+            # draw the center of the circle
+            cv2.circle(img,(i[0],i[1]),2,(0,0,255),3)
 
     circle1 = circle1[0][0]
     circle2 = circle2[0][0]
