@@ -69,7 +69,6 @@ def locate(img, originX, originY):
                 
                 rectangle = img[corner1y:corner2y,corner1x:corner2x]
                 
-                
                 imgList.append(rectangle)
                 
                 # img = cv2.circle(img,(x ,y),2,(0,0,255),6)
@@ -78,5 +77,5 @@ def locate(img, originX, originY):
                 
                 line_count += 1
     
-    
+
     return imgList

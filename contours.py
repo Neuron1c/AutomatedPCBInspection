@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import rotation
 import locateComponents
+import correlate
 from matplotlib import pyplot as plt
 
 def totuple(a):
@@ -27,18 +28,18 @@ def cropArea(img, rect):
 
     return img_crop
 
-def main():
-    widthMin = 300
-    heightMin = 300
+def main(imgName):
+    widthMin = 500
+    heightMin = 500
 
-    img = cv2.imread('test4.jpg')
+    img = cv2.imread(imgName)
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    ret, thresh = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY_INV)
+    ret, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
     image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-
-
+    
+    
     rect = 0
     for cnt in contours:
         rect = cv2.minAreaRect(cnt)
@@ -47,14 +48,17 @@ def main():
 
         if ((width >= widthMin) and (height > heightMin)):
             rectangle = rect
+            widthMin = width
+            heightMin = height
 
+
+
+    # cv2.drawContours(img,contours,-1,(0,0,255),10)
+
+    img = cropArea(img, rectangle)
 
     box = cv2.boxPoints(rectangle)
     box = np.int0(box)
-
-    # cv2.drawContours(img,[box],0,(0,0,255),10)
-    
-    img = cropArea(img, rectangle)
 
     x, originX, originY = rotation.getRotation(img, 0)
 
@@ -66,13 +70,17 @@ def main():
     imgList = locateComponents.locate(img, originX, originY)
     i = 0
 
-    for img in imgList:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        plt.figure(i)
-        plt.imshow(img)
-        i = i + 1
-    
-    # cv2.waitkey(0)
-    plt.show()
+    return imgList
 
-main()  
+    # for img in imgList:
+    #     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    #     plt.figure(i)
+    #     plt.imshow(img)
+    #     i = i + 1
+    
+    # # cv2.waitkey(0)
+    # plt.show()
+
+baseImgList = main('golden.jpg') 
+newImgList =  main('test1.jpg') 
+correlate.calculate(baseImgList, newImgList)
