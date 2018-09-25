@@ -24,8 +24,11 @@ def locate(img, originX, originY):
     
     height, width, depth = img.shape
 
-    boardDimensionX = 90
-    boardDimensionY = 50
+    # boardDimensionX = 90
+    # boardDimensionY = 50
+
+    boardDimensionX = 68
+    boardDimensionY = 57
 
     ratioX = width/boardDimensionX
     ratioY = height/boardDimensionY
@@ -77,5 +80,4 @@ def locate(img, originX, originY):
                 
                 line_count += 1
     
-
     return imgList
