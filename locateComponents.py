@@ -79,5 +79,7 @@ def locate(img, originX, originY):
                 # cv2.rectangle(img,(corner1x,corner1y),(corner2x,corner2y),(0,255,0),3)
                 
                 line_count += 1
-    
+                
+    # plt.imshow(img)
+    # plt.show()
     return imgList

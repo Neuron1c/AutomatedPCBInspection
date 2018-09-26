@@ -5,6 +5,8 @@ import test
 from matplotlib import pyplot as plt
 
 def calculate(imgList1, imgList2):
+
+    print('Test1', '\tTest2')
     for i in range(len(imgList1)):
 
         original1 = imgList1[i]
@@ -63,8 +65,8 @@ def calculate(imgList1, imgList2):
 
         img1 = np.uint8(img1)
         img2 = np.uint8(img2)
-
-        print(test.test1(original1,original2))
+        
+        print(test.test1(original1,original2), '\t',test.test1(original1,original2),)
         
         # gray = np.float32(img1)
         # dst = cv2.cornerHarris(gray,2,3,0.2)

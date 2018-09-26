@@ -36,7 +36,7 @@ def main(imgName):
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    ret, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+    ret, thresh = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY_INV)
     image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     
     
@@ -81,6 +81,6 @@ def main(imgName):
     # # cv2.waitkey(0)
     # plt.show()
 
-baseImgList = main('golden.jpg') 
-newImgList =  main('test1.jpg') 
+baseImgList = main('golden.jpg')
+newImgList =  main('test1.jpg')
 correlate.calculate(baseImgList, newImgList)

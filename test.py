@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 
 def test1(img1,img2):
 
+
     img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
     img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
 
@@ -34,6 +35,14 @@ def test1(img1,img2):
             B2 += img2[width-2+i,height-2+j,1]
             G2 += img2[width-2+i,height-2+j,0]
 
+            img1[width-2+i,height-2+j,2] = 0
+            img1[width-2+i,height-2+j,1] = 255
+            img1[width-2+i,height-2+j,0] = 0
+
+            img2[width-2+i,height-2+j,2] = 0
+            img2[width-2+i,height-2+j,1] = 255
+            img2[width-2+i,height-2+j,0] = 0
+
 
     # R2 = img2[width,height,2]
     # B2 = img2[width,height,1]
@@ -48,23 +57,53 @@ def test1(img1,img2):
     G1 = G1/25
     G2 = G2/25
 
+    # print(np.round(R1 - R2))
+    # print(np.round(B1 - B2))
+    # print(np.round(G1 - G2))
 
-    print(R1,R2)
-    print(B1,B2)
-    print(G1,G2)
 
-    if(R2 < R1 + 40 and R2 > R1 - 40):
-        if(B2 < B1 + 20 and B2 > B1 - 20):
-            if(G2 < G1 + 30 and G2 > G1 - 30):
+    if(R2 < R1 + 50 and R2 > R1 - 50):
+        if(B2 < B1 + 30 and B2 > B1 - 30):
+            if(G2 < G1 + 15 and G2 > G1 - 15):
                 return 1
     
     
     return 0
 
-    
+def test2(img1,img2):
+
+    lower = np.array([100, 110, 100], dtype = "uint8")
+    upper = np.array([210, 210, 210], dtype = "uint8")
+    mask = cv2.inRange(img2, lower, upper)
+
+    image, contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    img = img2
+    count = 0
+    for cnt in contours:
+
+        approx = cv2.approxPolyDP(cnt,0.15*cv2.arcLength(cnt,True),True)
         
 
-def test2(img1,img2):
+        if len(approx)==4:
+            rect = cv2.minAreaRect(cnt)
+            width = rect[1][0]
+            height = rect[1][1]
+
+            if ((width >= 5) and (height > 5)):
+                count += 1
+                rectangle = rect
+                cv2.drawContours(img,[cnt],0,(0,0,255),0)
+
+            
+
+        
+    if(count > 0):
+        return 0
+    else:
+        return 1
+
+
+def test3(img1,img2):
 
     width, height, depth = img1.shape
     width = np.round(width/2).astype(int)
