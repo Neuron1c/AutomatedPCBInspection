@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import scipy.signal
+import random as rng
 from matplotlib import pyplot as plt
 
 def test1(img1,img2):   #SIMPLE COLOUR GRAB
@@ -180,127 +181,112 @@ def test3(img1,img2):
 
 def test4(img1,img2):
 
+    kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]], dtype=np.float32)
+
+    imgLaplacian = cv2.filter2D(img2, cv2.CV_32F, kernel)
+    sharp = np.float32(img2)
+    imgResult = sharp - imgLaplacian
+
+    imgResult = np.clip(imgResult, 0, 255)
+    imgResult = imgResult.astype('uint8')
+    imgLaplacian = np.clip(imgLaplacian, 0, 255)
+    imgLaplacian = np.uint8(imgLaplacian)
+
+    bw = cv2.cvtColor(imgResult, cv2.COLOR_BGR2GRAY)
+    _, bw = cv2.threshold(bw, 150, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+
+    # img2 = imgResult
+
     width, height, depth = img2.shape
     width = np.round(width/2).astype(int)
     height = np.round(height/2).astype(int)
-
-    # R = img1[width,height,2] - 20
-    # B = img1[width,height,1] - 20
-    # G = img1[width,height,0] - 20
-
-    R = 0
-    B = 0
-    G = 0
-
-    for i in range(5):
-        for j in range(5):
-            R += img2[width-2+i,height-2+j,2]
-            B += img2[width-2+i,height-2+j,1]
-            G += img2[width-2+i,height-2+j,0]
-
-    R = R/25 - 20
-    B = B/25 - 10
-    G = G/25 - 10
-
-    if(R < 0):
-        R = 0
-    if(G < 0):
-        G = 0
-    if(B < 0):
-        B = 0
-
-    # lower = np.array([G, B, R], dtype = "uint8")
-    # upper = np.array([G+20, B+20, R+40], dtype = "uint8")
-    # maskRGB = cv2.inRange(img1, lower, upper)
 
     lower = np.array([50, 50, 50], dtype = "uint8")
     upper = np.array([80, 100, 80], dtype = "uint8")
     maskRGB = cv2.inRange(img2, lower, upper)
 
     hsv = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
-        
 
-    # H = hsv[width,height,0] - 30
-    # S = hsv[width,height,1] - 10
-    # V = hsv[width,height,2] - 30
 
-    H = 0
-    S = 0
-    V = 0
-
-    for i in range(5):
-        for j in range(5):
-            H += hsv[width-2+i,height-2+j,0]
-            S += hsv[width-2+i,height-2+j,1]
-            V += hsv[width-2+i,height-2+j,2]
-
-    H = H/25 - 20
-    S = S/25 - 10
-    V = V/25 - 20
-
-    if(H < 0):
-        H = 0
-    if(S < 0):
-        S = 0
-    if(V < 0):
-        V = 0
-
-    lower = np.array([180, 0, 15], dtype = "uint8")
-    upper = np.array([190, 20, 40], dtype = "uint8")
+    lower = np.array([80, 0, 20], dtype = "uint8")
+    upper = np.array([120, 40, 100], dtype = "uint8")
     maskHSV = cv2.inRange(hsv, lower, upper)
         
     CIE = cv2.cvtColor(img2, cv2.COLOR_BGR2LAB)
 
-    # L = CIE[width,height,0] - 18
-    # u = CIE[width,height,1] - 5
-    # v = CIE[width,height,2] - 5
 
-    L = 0
-    u = 0
-    v = 0
-
-    for i in range(5):
-        for j in range(5):
-            L += CIE[width-2+i,height-2+j,0]
-            u += CIE[width-2+i,height-2+j,1]
-            v += CIE[width-2+i,height-2+j,2]
-
-    L = L/25 - 10
-    u = u/25 - 5
-    v = v/25 - 5
-
-    if(L < 0):
-        L = 0
-    if(u < 0):
-        s = 0
-    if(v < 0):
-        v = 0
-
-    lower = np.array([L, u, v], dtype = "uint8")
-    upper = np.array([L+20, u+10, v+10], dtype = "uint8")
+    lower = np.array([50, 120, 120], dtype = "uint8")
+    upper = np.array([80, 130, 130], dtype = "uint8")
     maskCIE = cv2.inRange(CIE, lower, upper)
 
-        # for i in range(mask.shape[0]):
-        #     for j in range(mask.shape[1]):
-        #         if(mask[i,j] == 255):
-        #             mask[i,j] = 0
-        #         else:
-        #             mask[i,j] = 255
-        
+
     maskADD = cv2.add(maskHSV,maskRGB)
     mask = maskCIE*maskADD
+
+    _, contours, _ = cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    mask = np.zeros(mask.shape)
+    count = 0
+    
+    for cnt in contours:
+
+        approx = cv2.approxPolyDP(cnt,0.12*cv2.arcLength(cnt,True),True)
+        
+
+        if len(approx)==4:
+            rect = cv2.minAreaRect(cnt)
+            width = rect[1][0]
+            height = rect[1][1]
+
+            if ((width >= 5) and (height > 5)):
+                count += 1
+                cv2.drawContours(mask,[cnt],0,(255),-1)
+
+    plt.imshow(mask)
+    plt.show()
+
+    dist = cv2.distanceTransform(mask, cv2.DIST_L2, 3)
+    cv2.normalize(dist, dist, 0, 1.0, cv2.NORM_MINMAX)
+
+    _, dist = cv2.threshold(dist, 0.4, 1.0, cv2.THRESH_BINARY)
+
+    kernel1 = np.ones((3,3), dtype=np.uint8)
+    dist = cv2.dilate(dist, kernel1)
+
+    dist_8u = dist.astype('uint8')
+
+    _, contours, _ = cv2.findContours(dist_8u, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    markers = np.zeros(dist.shape, dtype=np.int32)
+
+    for i in range(len(contours)):
+        cv2.drawContours(markers, contours, i, (i+1), -1)
+
+
+
+    cv2.watershed(imgResult, markers)
+
+    mark = markers.astype('uint8')
+    mark = cv2.bitwise_not(mark)
+
+    colors = []
+    for contour in contours:
+        colors.append((rng.randint(0,256), rng.randint(0,256), rng.randint(0,256)))
+    # Create the result image
+    dst = np.zeros((markers.shape[0], markers.shape[1], 3), dtype=np.uint8)
+    # Fill labeled objects with random colors
+    for i in range(markers.shape[0]):
+        for j in range(markers.shape[1]):
+            index = markers[i,j]
+            if index > 0 and index <= len(contours):
+                dst[i,j,:] = colors[index-1]
+
+
     plt.figure('1')
-    plt.imshow(maskHSV)
+    plt.imshow(dst)
+
 
     # img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-    # img2[width,height] = [0,0,255]
     # plt.figure('2')
     # plt.imshow(img2)
-
-        # img = cv2.subtract(gray2,gray1)
-        # print(img)
-
-        # plt.figure('3')
-        # plt.imshow(img)
 
     plt.show()

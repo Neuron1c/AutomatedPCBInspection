@@ -8,7 +8,7 @@ def calculate(imgList1, imgList2):
 
     print('Test1', '\tTest2', '\tTest3')
     # len(imgList1)
-    for i in range(2):
+    for i in range(1):
 
         original1 = imgList1[i]
         original2 = imgList2[i]
