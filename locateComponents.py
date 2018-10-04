@@ -7,9 +7,7 @@ def componentDimensions(componentCode):
     i = []
     while componentCode:
         digit = componentCode % 10
-        # do whatever with digit
         i.append(digit)
-        # remove last digit from number (as integer)
         componentCode //= 10
         
     compWidth = i[1] + i[0]/10
@@ -18,9 +16,6 @@ def componentDimensions(componentCode):
     return compWidth, compHeight
     
 def locate(img, originX, originY):
-    
-    
-    compWidth, compHeight = componentDimensions(2012)
     
     height, width, depth = img.shape
 
@@ -49,27 +44,37 @@ def locate(img, originX, originY):
                 line_count += 1
             else:
                 
-                
+                if(row[0][:1] == 'R'):
+                    compWidth, compHeight = componentDimensions(int(row[5]))
+                    # print(compWidth, compHeight, ratio)
+
+                elif(row[0][:1] == 'I'):
+                    compWidth = float(row[5])
+                    compHeight = float(row[6])
+                    # print(compWidth, compHeight, ratio)
+
                 x =  int(originX + np.round(float(row[2])*ratio))
                 y =  int(originY - np.round(float(row[3])*ratio))
                 
+                compWidth = compWidth/2
+                compHeight = compHeight/2
+
                 if(float(row[4]) == 90 or float(row[4]) == 270):
 
-                    corner1x = int(x - np.round(compWidth*ratio))
-                    corner1y = int(y - np.round(compHeight*ratio))
+                    corner1x = int(x - np.round(compWidth*ratio + ratio))
+                    corner1y = int(y - np.round(compHeight*ratio + ratio))
                     
-                    corner2x = int(x + np.round(compWidth*ratio))
-                    corner2y = int(y + np.round(compHeight*ratio))
+                    corner2x = int(x + np.round(compWidth*ratio + ratio))
+                    corner2y = int(y + np.round(compHeight*ratio + ratio))
                 
                 else:
                     
-                    corner1x = int(x - np.round(compHeight*ratio))
-                    corner1y = int(y - np.round(compWidth*ratio))
+                    corner1x = int(x - np.round(compHeight*ratio + ratio))
+                    corner1y = int(y - np.round(compWidth*ratio + ratio))
                     
-                    corner2x = int(x + np.round(compHeight*ratio))
-                    corner2y = int(y + np.round(compWidth*ratio))
+                    corner2x = int(x + np.round(compHeight*ratio + ratio))
+                    corner2y = int(y + np.round(compWidth*ratio + ratio))
                     
-                
                 rectangle = img[corner1y:corner2y,corner1x:corner2x]
                 
                 imgList.append(rectangle)

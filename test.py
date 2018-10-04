@@ -4,8 +4,7 @@ import scipy.signal
 import random as rng
 from matplotlib import pyplot as plt
 
-def test1(img1,img2):   #SIMPLE COLOUR GRAB
-
+def test1(img1,img2): #SIMPLE COLOUR GRAB USING HSV
 
     img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
     img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
@@ -15,7 +14,7 @@ def test1(img1,img2):   #SIMPLE COLOUR GRAB
     height = np.round(height/2).astype(int)
 
     # R1 = img1[width,height,2]
-    # B1 = img1[width,height,1]
+    # B1 = img1[width,height,1] 
     # G1 = img1[width,height,0]
 
     R1 = 0
@@ -36,14 +35,6 @@ def test1(img1,img2):   #SIMPLE COLOUR GRAB
             B2 += img2[width-2+i,height-2+j,1]
             G2 += img2[width-2+i,height-2+j,0]
 
-            img1[width-2+i,height-2+j,2] = 0
-            img1[width-2+i,height-2+j,1] = 255
-            img1[width-2+i,height-2+j,0] = 0
-
-            img2[width-2+i,height-2+j,2] = 0
-            img2[width-2+i,height-2+j,1] = 255
-            img2[width-2+i,height-2+j,0] = 0
-
 
     # R2 = img2[width,height,2]
     # B2 = img2[width,height,1]
@@ -61,7 +52,6 @@ def test1(img1,img2):   #SIMPLE COLOUR GRAB
     # print(np.round(R1 - R2))
     # print(np.round(B1 - B2))
     # print(np.round(G1 - G2))
-
 
     if(R2 < R1 + 50 and R2 > R1 - 50):
         if(B2 < B1 + 30 and B2 > B1 - 30):
@@ -83,12 +73,12 @@ def test2(img1,img2): #ATTEMPT TO DETECT SQUARE SOLDER PADS
     img = img2
     count = 0
 
-    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # img = np.pad(gray,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = np.pad(gray,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))
     
     for cnt in contours:
 
-        approx = cv2.approxPolyDP(cnt,0.11*cv2.arcLength(cnt,True),True)
+        approx = cv2.approxPolyDP(cnt,0.12*cv2.arcLength(cnt,True),True)
         
 
         if len(approx)==4:
@@ -98,7 +88,7 @@ def test2(img1,img2): #ATTEMPT TO DETECT SQUARE SOLDER PADS
 
             if ((width >= 5) and (height > 5)):
                 count += 1
-                # cv2.drawContours(img,[cnt],0,(255),0)
+                cv2.drawContours(img,[cnt],0,(255),0)
 
             
     # if(count > 1):
@@ -112,36 +102,13 @@ def test2(img1,img2): #ATTEMPT TO DETECT SQUARE SOLDER PADS
     else:
         return 1
 
-def test3(img1,img2):
-    testor = test1(img1,img2)
-
-    # rbg = [0,0,0]
-
-    # for i in range(3):
-    #     colour1 = img1[:,:,i]
-    #     colour2 = img2[:,:,i]
-
-    #     colour1 = colour1 - np.mean(colour1)
-    #     colour2 = colour2 - np.mean(colour2)
-
-    #     maxInd1 = np.unravel_index(np.argmax(colour1), colour1.shape)
-    #     maxInd2 = np.unravel_index(np.argmax(colour2), colour.shape)
-
-    #     max1 = colour1[maxInd1]
-    #     max2 = colour2[maxInd2]
-
-    #     colour1 = colour1/max1
-    #     colour2 = colour2/max2
-
-    #     corr = scipy.signal.correlate2d(img1, img1)
-    #     corrMax = np.unravel_index(np.argmax(corr), corr.shape)
-
-    #     rgb[i] = corr[corrMax]
-
-    # print(testor, rgb)
+def test3(img1,img2): #CORRELATION TEST
 
     img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
+    x,y = img1.shape
+    area = x*y
 
     img1 = img1 - np.mean(img1)
     img2 = img2 - np.mean(img2)
@@ -172,12 +139,10 @@ def test3(img1,img2):
     corr = scipy.signal.correlate2d(img1, img2)
     corrMax = np.unravel_index(np.argmax(corr), corr.shape)
 
-    if(corr[corrMax] > 600):
+    if(corr[corrMax]/area > 0.1):
         return 0
     else:
         return 1
-
-
 
 def test4(img1,img2):
 
@@ -207,44 +172,41 @@ def test4(img1,img2):
 
     hsv = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
 
-
     lower = np.array([80, 0, 20], dtype = "uint8")
     upper = np.array([120, 40, 100], dtype = "uint8")
     maskHSV = cv2.inRange(hsv, lower, upper)
         
     CIE = cv2.cvtColor(img2, cv2.COLOR_BGR2LAB)
 
-
     lower = np.array([50, 120, 120], dtype = "uint8")
     upper = np.array([80, 130, 130], dtype = "uint8")
     maskCIE = cv2.inRange(CIE, lower, upper)
 
-
     maskADD = cv2.add(maskHSV,maskRGB)
     mask = maskCIE*maskADD
 
-    _, contours, _ = cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    mask = np.zeros(mask.shape)
-    count = 0
+
+    # _, contours, _ = cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    # mask = np.zeros(mask.shape).astype('uint8')
+    # count = 0
     
-    for cnt in contours:
+    # for cnt in contours:
 
-        approx = cv2.approxPolyDP(cnt,0.12*cv2.arcLength(cnt,True),True)
-        
+    #     approx = cv2.approxPolyDP(cnt,0.12*cv2.arcLength(cnt,True),True)  
 
-        if len(approx)==4:
-            rect = cv2.minAreaRect(cnt)
-            width = rect[1][0]
-            height = rect[1][1]
+    #     if len(approx)==4:
+    #         rect = cv2.minAreaRect(cnt)
+    #         width = rect[1][0]
+    #         height = rect[1][1]
 
-            if ((width >= 5) and (height > 5)):
-                count += 1
-                cv2.drawContours(mask,[cnt],0,(255),-1)
+    #         if ((width >= 5) and (height > 5)):
+    #             count += 1
+    #             cv2.drawContours(mask,[cnt],0,(255),-1)
 
-    plt.imshow(mask)
-    plt.show()
+    # plt.imshow(mask)
+    # plt.show()
 
-    dist = cv2.distanceTransform(mask, cv2.DIST_L2, 3)
+    dist = cv2.distanceTransform(maskRGB, cv2.DIST_L2, 3)
     cv2.normalize(dist, dist, 0, 1.0, cv2.NORM_MINMAX)
 
     _, dist = cv2.threshold(dist, 0.4, 1.0, cv2.THRESH_BINARY)
@@ -258,12 +220,11 @@ def test4(img1,img2):
 
     markers = np.zeros(dist.shape, dtype=np.int32)
 
+
     for i in range(len(contours)):
         cv2.drawContours(markers, contours, i, (i+1), -1)
 
-
-
-    cv2.watershed(imgResult, markers)
+    markers = cv2.watershed(imgResult, markers)
 
     mark = markers.astype('uint8')
     mark = cv2.bitwise_not(mark)
@@ -282,8 +243,7 @@ def test4(img1,img2):
 
 
     plt.figure('1')
-    plt.imshow(dst)
-
+    plt.imshow(img2)
 
     # img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
     # plt.figure('2')
