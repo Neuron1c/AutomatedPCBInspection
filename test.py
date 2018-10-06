@@ -3,6 +3,7 @@ import cv2
 import scipy.signal
 import random as rng
 from matplotlib import pyplot as plt
+import matplotlib.mlab as mlab
 
 def test1(img1,img2): #SIMPLE COLOUR GRAB USING HSV
 
@@ -166,8 +167,8 @@ def test4(img1,img2):
     width = np.round(width/2).astype(int)
     height = np.round(height/2).astype(int)
 
-    lower = np.array([50, 50, 50], dtype = "uint8")
-    upper = np.array([80, 100, 80], dtype = "uint8")
+    lower = np.array([60, 60, 60], dtype = "uint8")
+    upper = np.array([100, 110, 100], dtype = "uint8")
     maskRGB = cv2.inRange(img2, lower, upper)
 
     hsv = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
@@ -178,8 +179,9 @@ def test4(img1,img2):
         
     CIE = cv2.cvtColor(img2, cv2.COLOR_BGR2LAB)
 
-    lower = np.array([50, 120, 120], dtype = "uint8")
-    upper = np.array([80, 130, 130], dtype = "uint8")
+
+    lower = np.array([55, 120, 120], dtype = "uint8")
+    upper = np.array([100, 135, 135], dtype = "uint8")
     maskCIE = cv2.inRange(CIE, lower, upper)
 
     maskADD = cv2.add(maskHSV,maskRGB)
@@ -203,28 +205,26 @@ def test4(img1,img2):
     #             count += 1
     #             cv2.drawContours(mask,[cnt],0,(255),-1)
 
-    # plt.imshow(mask)
-    # plt.show()
+    
 
-    dist = cv2.distanceTransform(maskRGB, cv2.DIST_L2, 3)
+    dist = cv2.distanceTransform(mask, cv2.DIST_L2, 3)
     cv2.normalize(dist, dist, 0, 1.0, cv2.NORM_MINMAX)
 
     _, dist = cv2.threshold(dist, 0.4, 1.0, cv2.THRESH_BINARY)
 
     kernel1 = np.ones((3,3), dtype=np.uint8)
     dist = cv2.dilate(dist, kernel1)
-
+    
     dist_8u = dist.astype('uint8')
 
     _, contours, _ = cv2.findContours(dist_8u, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     markers = np.zeros(dist.shape, dtype=np.int32)
 
-
     for i in range(len(contours)):
         cv2.drawContours(markers, contours, i, (i+1), -1)
 
-    markers = cv2.watershed(imgResult, markers)
+    markers = cv2.watershed(img2, markers)
 
     mark = markers.astype('uint8')
     mark = cv2.bitwise_not(mark)
@@ -243,10 +243,77 @@ def test4(img1,img2):
 
 
     plt.figure('1')
-    plt.imshow(img2)
+
+    imgResult = cv2.cvtColor(imgResult, cv2.COLOR_BGR2RGB)
+    out = np.concatenate((maskRGB,maskHSV,maskCIE,mask), axis = 1)
+    plt.imshow(maskCIE)
 
     # img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
     # plt.figure('2')
     # plt.imshow(img2)
 
     plt.show()
+
+def test5(img1,img2):
+
+    RGB1 = [[0,0,0,0], [0,0,0,0], [0,0,0,0]]
+    RGB2 = [[0,0,0,0], [0,0,0,0], [0,0,0,0]]
+
+    y1,x1,_ = img1.shape
+    y2,x2,_ = img2.shape
+
+    R = img1[:,:,2]
+    G = img1[:,:,1]
+    B = img1[:,:,0]
+
+    RGB1[0][0] = np.sum(R < 63)
+    RGB1[0][1] = np.sum(np.logical_and((R >= 63),(R < 127)))
+    RGB1[0][2] = np.sum(np.logical_and((R >= 127),(R < 191)))
+    RGB1[0][3] = np.sum(R >= 191)
+
+    RGB1[1][0] = np.sum(B < 63)
+    RGB1[1][1] = np.sum(np.logical_and((B >= 63),(B < 127)))
+    RGB1[1][2] = np.sum(np.logical_and((B >= 127),(B < 191)))
+    RGB1[1][3] = np.sum(B >= 191)
+
+    RGB1[2][0] = np.sum(G < 63)
+    RGB1[2][1] = np.sum(np.logical_and((G >= 63),(G < 127)))
+    RGB1[2][2] = np.sum(np.logical_and((G >= 127),(G < 191)))
+    RGB1[2][3] = np.sum(G >= 191)
+
+    R = img2[:,:,2]
+    G = img2[:,:,1]
+    B = img2[:,:,0]
+
+    RGB2[0][0] = np.sum(R < 63)
+    RGB2[0][1] = np.sum(np.logical_and((R >= 63),(R < 127)))
+    RGB2[0][2] = np.sum(np.logical_and((R >= 127),(R < 191)))
+    RGB2[0][3] = np.sum(R >= 191)
+
+    RGB2[1][0] = np.sum(B < 63)
+    RGB2[1][1] = np.sum(np.logical_and((B >= 63),(B < 127)))
+    RGB2[1][2] = np.sum(np.logical_and((B >= 127),(B < 191)))
+    RGB2[1][3] = np.sum(B >= 191)
+
+    RGB2[2][0] = np.sum(G < 63)
+    RGB2[2][1] = np.sum(np.logical_and((G >= 63),(G < 127)))
+    RGB2[2][2] = np.sum(np.logical_and((G >= 127),(G < 191)))
+    RGB2[2][3] = np.sum(G >= 191)
+    
+    RGB1 = np.array(RGB1)/(x1*y1)
+    RGB2 = np.array(RGB2)/(x2*y2)
+    # print(RGB1[0])
+    # print(RGB2[0])
+    # print()
+    # x = np.zeros(20)
+
+    # vals = np.linspace(0.17,0.2,20)
+
+    # for i in range(20):
+    #     x[i] = np.allclose(RGB1,RGB2, 0 ,vals[i])
+
+    # print(x)
+
+    if(np.allclose(RGB1,RGB2, 0 ,0.18)):
+        return 0
+    return 1
