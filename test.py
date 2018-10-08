@@ -318,13 +318,100 @@ def test5(img1,img2):
         return 0
     return 1
 
-
 def test6(img1,img2):
-    # img1 = img1 - np.mean(img1)
-    # img2 = img2 - np.mean(img2)
-    out = img1
     
-    cv2.subtract(img1,img2,out)
-    print(img2)
-    plt.imshow(img2)
+    
+
+    lower = np.array([120, 120, 120], dtype = "uint8")
+    upper = np.array([255, 255, 255], dtype = "uint8")
+    mask = cv2.inRange(img1, lower, upper)
+
+    
+
+    mask2 = np.pad(mask,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))
+
+    image, contours, hierarchy = cv2.findContours(mask2,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    img = img1
+    count = 0
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = np.pad(gray,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))
+
+    for cnt in contours:
+
+        approx = cv2.approxPolyDP(cnt,0.12*cv2.arcLength(cnt,True),True)
+
+
+        if len(approx)==4:
+            rect = cv2.minAreaRect(cnt)
+            width = rect[1][0]
+            height = rect[1][1]
+
+            if ((width >= 5) and (height > 5)):
+                count += 1
+                cv2.drawContours(img,[cnt],0,(255),0)
+                print(cnt)
+
+    mask = 255 - mask
+
+    green1 = img1[:,:,1].astype(int)
+    green2 = img2[:,:,1].astype(int)
+
+
+    height, width = green1.shape
+    count = 0
+    mean1 = 0
+    mean2 = 0
+    for i in range(height):
+        for j in range(width):
+
+            if(mask[i,j] == 0):
+                count += 1
+                mean1 += green1[i,j]
+                mean2 += green2[i,j]
+
+    mean1 = mean1/count
+    mean2 = mean2/count
+
+    # mean1 = np.mean(green1)
+    # mean2 = np.mean(green2)
+
+    green2 = green2.astype(int) + (mean1 - mean2)
+    green2 = np.clip(green2,0,255).astype('uint8')
+    green1 = green1.astype('uint8')
+    mask = mask.astype('uint8')
+
+    out = cv2.subtract(green2,green1, mask = mask)
+
+    # img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    # img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
+    # norm1 = green1.astype(int) - np.mean(green1)
+    # norm2 = green2.astype(int) - np.mean(green2)
+
+    # min1 = np.unravel_index(np.argmin(norm1), norm1.shape)
+    # min2 = np.unravel_index(np.argmin(norm2), norm2.shape)
+
+    # norm1 = norm1 + np.abs(norm1[min1])
+    # norm2 = norm2 + np.abs(norm2[min2])
+
+    # max1 = np.unravel_index(np.argmax(norm1), norm1.shape)
+    # max2 = np.unravel_index(np.argmax(norm2), norm2.shape)
+
+    # norm1 = (norm1/norm1[max1])*255
+    # norm2 = (norm2/norm2[max2])*255
+
+    # out = cv2.subtract(norm1,norm2,mask = mask)
+    # out = np.round(out)
+    # out = np.clip(out,0,255).astype('uint8')
+
+    # out = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
+
+    # ret, thresh = cv2.threshold(out, 100, 255, cv2.THRESH_BINARY)
+
+    out = np.concatenate((green1 ,out , green2), axis = 1)
+
+    # print(np.mean(thresh))
+
+    plt.imshow(mask2,cmap = 'gray')
     plt.show()

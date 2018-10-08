@@ -8,10 +8,10 @@ def calculate(imgList1, imgList2):
 
     print('Test1', '\tTest2', '\tTest3','\tTest5')
     # len(imgList1)
-    for i in range(1):
+    for i in range(len(imgList1) - 1):
 
-        original1 = imgList1[i]
-        original2 = imgList2[i]
+        original1 = imgList1[i + 1]
+        original2 = imgList2[i + 1]
 
         img1 = cv2.cvtColor(original1, cv2.COLOR_BGR2GRAY).astype(np.float64)
         img2 = cv2.cvtColor(original2, cv2.COLOR_BGR2GRAY).astype(np.float64)
