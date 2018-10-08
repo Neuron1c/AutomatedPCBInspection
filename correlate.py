@@ -8,8 +8,8 @@ def calculate(imgList1, imgList2):
 
     print('Test1', '\tTest2', '\tTest3','\tTest5')
     # len(imgList1)
-    for i in range(len(imgList1)):
-        
+    for i in range(1):
+
         original1 = imgList1[i]
         original2 = imgList2[i]
 
@@ -66,17 +66,15 @@ def calculate(imgList1, imgList2):
 
         img1 = np.uint8(img1)
         img2 = np.uint8(img2)
-        
-        # plt.figure('1')
-        # plt.imshow(original1)
-        # plt.figure('2')
-        # plt.imshow(original2)
+
+        # x = np.concatenate(original1,original2)
+        # plt.imshow(x)
         # plt.show()
 
         # print(test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2))
-    
-        test.test4(original1,original2)
-    
+
+        test.test6(original1,original2)
+
         # gray = np.float32(img1)
         # dst = cv2.cornerHarris(gray,2,3,0.2)
         # original1[dst>0.01*dst.max()]=[0,0,255]
@@ -91,4 +89,3 @@ def calculate(imgList1, imgList2):
 
         # gray1 = cv2.Canny(img1,50,100)
         # gray2 = cv2.Canny(img2,50,100)
-
