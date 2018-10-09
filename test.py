@@ -319,14 +319,14 @@ def test5(img1,img2):
     return 1
 
 def test6(img1,img2):
-    
-    
+
+
 
     lower = np.array([120, 120, 120], dtype = "uint8")
     upper = np.array([255, 255, 255], dtype = "uint8")
     mask = cv2.inRange(img1, lower, upper)
 
-    
+
 
     mask2 = np.pad(mask,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))
 
@@ -337,20 +337,35 @@ def test6(img1,img2):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = np.pad(gray,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))
 
+    flag = 1
     for cnt in contours:
 
         approx = cv2.approxPolyDP(cnt,0.12*cv2.arcLength(cnt,True),True)
 
-
         if len(approx)==4:
+
             rect = cv2.minAreaRect(cnt)
             width = rect[1][0]
             height = rect[1][1]
 
             if ((width >= 5) and (height > 5)):
+
+                if flag:
+                    print('I DID IT')
+                    square = approx
+                    flag = 0
+                else:
+                    square = np.concatenate((square[:,0,:], approx[:,0,:]))
+
                 count += 1
-                cv2.drawContours(img,[cnt],0,(255),0)
-                print(cnt)
+
+
+    rect = cv2.minAreaRect(square)
+    box = cv2.boxPoints(rect)
+    box = np.int0(box-10)
+    mask3 = np.array(mask)
+    cv2.drawContours(mask3,[box],0,(255),-1)
+
 
     mask = 255 - mask
 
@@ -365,13 +380,14 @@ def test6(img1,img2):
     for i in range(height):
         for j in range(width):
 
-            if(mask[i,j] == 0):
+            if(mask3[i,j] == 0):
                 count += 1
                 mean1 += green1[i,j]
                 mean2 += green2[i,j]
 
     mean1 = mean1/count
     mean2 = mean2/count
+    # print(mean1,mean2)
 
     # mean1 = np.mean(green1)
     # mean2 = np.mean(green2)
@@ -382,6 +398,8 @@ def test6(img1,img2):
     mask = mask.astype('uint8')
 
     out = cv2.subtract(green2,green1, mask = mask)
+    out = np.round(out).astype('uint8')
+
 
     # img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     # img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
@@ -406,12 +424,29 @@ def test6(img1,img2):
     # out = np.clip(out,0,255).astype('uint8')
 
     # out = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
+    mask = 255 - mask
+    mask4 = np.array(mask3.astype(int) + mask.astype(int))
+    mask4 = np.clip(mask4,0,255) - mask.astype(int)
+    x = np.clip(out.astype(int) + mask4.astype(int), 0,255)
 
-    # ret, thresh = cv2.threshold(out, 100, 255, cv2.THRESH_BINARY)
 
-    out = np.concatenate((green1 ,out , green2), axis = 1)
+    count = 0
+    mean = 0
+    for i in range(height):
+        for j in range(width):
 
-    # print(np.mean(thresh))
+            if(mask4[i,j] != 0):
+                count += 1
+                mean += out[i,j]
 
-    plt.imshow(mask2,cmap = 'gray')
+    mean = mean/count
+    print(mean)
+    plt.imshow(x)
     plt.show()
+    # ret, thresh = cv2.threshold(out, 40, 255, cv2.THRESH_BINARY)
+
+    # out = np.concatenate((green1 ,out , green2), axis = 1)
+    #
+    #
+    # plt.imshow(thresh,cmap='gray')
+    # plt.show()
