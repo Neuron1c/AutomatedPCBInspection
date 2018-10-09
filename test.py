@@ -351,7 +351,6 @@ def test6(img1,img2):
             if ((width >= 5) and (height > 5)):
 
                 if flag:
-                    print('I DID IT')
                     square = approx
                     flag = 0
                 else:
@@ -424,9 +423,11 @@ def test6(img1,img2):
     # out = np.clip(out,0,255).astype('uint8')
 
     # out = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
+
     mask = 255 - mask
     mask4 = np.array(mask3.astype(int) + mask.astype(int))
     mask4 = np.clip(mask4,0,255) - mask.astype(int)
+
     x = np.clip(out.astype(int) + mask4.astype(int), 0,255)
 
 
