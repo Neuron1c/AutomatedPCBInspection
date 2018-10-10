@@ -12,7 +12,7 @@ def totuple(a):
         return a
 
 def cropArea(img, rect):
-    
+
     angle = rect[2]
     rows,cols = img.shape[0], img.shape[1]
     M = cv2.getRotationMatrix2D((cols/2,rows/2),angle,1)
@@ -20,10 +20,10 @@ def cropArea(img, rect):
 
     # rect0 = (rect[0], rect[1], 0.0)
     box = cv2.boxPoints(rect)
-    pts = np.int0(cv2.transform(np.array([box]), M))[0]    
+    pts = np.int0(cv2.transform(np.array([box]), M))[0]
     pts[pts < 0] = 0
 
-    img_crop = img_rot[pts[1][1]:pts[0][1], 
+    img_crop = img_rot[pts[1][1]:pts[0][1],
                        pts[1][0]:pts[2][0]]
 
     return img_crop
@@ -38,8 +38,8 @@ def main(imgName):
 
     ret, thresh = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY_INV)
     image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    
-    
+
+
     rect = 0
     for cnt in contours:
         rect = cv2.minAreaRect(cnt)
@@ -77,7 +77,7 @@ def main(imgName):
     #     plt.figure(i)
     #     plt.imshow(img)
     #     i = i + 1
-    
+
     # # cv2.waitkey(0)
     # plt.show()
 

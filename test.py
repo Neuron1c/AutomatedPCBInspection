@@ -320,51 +320,81 @@ def test5(img1,img2):
 
 def test6(img1,img2):
 
-
-
-    lower = np.array([120, 120, 120], dtype = "uint8")
+    lower = np.array([140, 140, 140], dtype = "uint8")
     upper = np.array([255, 255, 255], dtype = "uint8")
     mask = cv2.inRange(img1, lower, upper)
 
+    kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]], dtype=np.float32)
 
+    imgLaplacian = cv2.filter2D(img1, cv2.CV_32F, kernel)
+    sharp = np.float32(img1)
+    img1 = sharp - imgLaplacian
+
+    img1 = np.clip(img1, 0, 255)
+    img1 = img1.astype('uint8')
+
+
+    imgLaplacian = cv2.filter2D(img2, cv2.CV_32F, kernel)
+    sharp = np.float32(img2)
+    img2 = sharp - imgLaplacian
+
+    img2 = np.clip(img2, 0, 255)
+    img2 = img2.astype('uint8')
 
     mask2 = np.pad(mask,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))
 
     image, contours, hierarchy = cv2.findContours(mask2,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    img = img1
+    indSquare = None
     count = 0
-
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img = np.pad(gray,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))
-
     flag = 1
+
     for cnt in contours:
 
-        approx = cv2.approxPolyDP(cnt,0.12*cv2.arcLength(cnt,True),True)
-
+        approx = cv2.approxPolyDP(cnt,0.1*cv2.arcLength(cnt,True),True)
+        # cv2.drawContours(mask2,approx,-1,[125],3)
         if len(approx)==4:
-
+            count += 1
             rect = cv2.minAreaRect(cnt)
             width = rect[1][0]
             height = rect[1][1]
 
-            if ((width >= 5) and (height > 5)):
-
+            if ((width >= 2) and (height > 2)):
+                # cv2.drawContours(img1,[x - 10 for x in cnt],-1,(0,0,255),3)
                 if flag:
-                    square = approx
+                    square = approx[:]
+                    indSquare = approx[:]
+                    indSquare = [indSquare]
                     flag = 0
                 else:
-                    square = np.concatenate((square[:,0,:], approx[:,0,:]))
+                    # print(square.shape, count)
+                    square = np.concatenate((square, approx))
+                    # indSquare = np.stack((indSquare, approx), axis = 1)
+                    indSquare.append(approx)
 
-                count += 1
+                # count += 1
+    # print(indSquare, count)
+    # for i in range(count):
 
+
+    # contours[:] = [x - 10 for x in contours]
+    # cv2.drawContours(img1,contours,-1,(0,0,255), 3)
+    if(indSquare == None):
+        return 0
+
+    for sqr in indSquare:
+        rect = cv2.minAreaRect(sqr[:,0,:])
+        box = cv2.boxPoints(rect)
+        box = np.int0(box - 10)
+        cv2.drawContours(mask, [box], 0,(255),-1)
 
     rect = cv2.minAreaRect(square)
     box = cv2.boxPoints(rect)
     box = np.int0(box-10)
     mask3 = np.array(mask)
-    cv2.drawContours(mask3,[box],0,(255),-1)
 
+    # cv2.drawContours(mask,[box1],0,(255),-1)
+    # cv2.drawContours(mask,[box2],0,(255),-1)
+    cv2.drawContours(mask3,[box],0,(255),-1)
 
     mask = 255 - mask
 
@@ -400,54 +430,67 @@ def test6(img1,img2):
     out = np.round(out).astype('uint8')
 
 
-    # img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-    # img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-
-    # norm1 = green1.astype(int) - np.mean(green1)
-    # norm2 = green2.astype(int) - np.mean(green2)
-
-    # min1 = np.unravel_index(np.argmin(norm1), norm1.shape)
-    # min2 = np.unravel_index(np.argmin(norm2), norm2.shape)
-
-    # norm1 = norm1 + np.abs(norm1[min1])
-    # norm2 = norm2 + np.abs(norm2[min2])
-
-    # max1 = np.unravel_index(np.argmax(norm1), norm1.shape)
-    # max2 = np.unravel_index(np.argmax(norm2), norm2.shape)
-
-    # norm1 = (norm1/norm1[max1])*255
-    # norm2 = (norm2/norm2[max2])*255
-
-    # out = cv2.subtract(norm1,norm2,mask = mask)
-    # out = np.round(out)
-    # out = np.clip(out,0,255).astype('uint8')
-
-    # out = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
-
     mask = 255 - mask
     mask4 = np.array(mask3.astype(int) + mask.astype(int))
     mask4 = np.clip(mask4,0,255) - mask.astype(int)
 
-    x = np.clip(out.astype(int) + mask4.astype(int), 0,255)
+    # x = np.clip(out.astype(int) + mask4.astype(int), 0,255)
 
 
     count = 0
     mean = 0
+
     for i in range(height):
         for j in range(width):
 
             if(mask4[i,j] != 0):
                 count += 1
                 mean += out[i,j]
+            else:
+                out[i,j] = 0
 
     mean = mean/count
-    print(mean)
-    plt.imshow(x)
-    plt.show()
-    # ret, thresh = cv2.threshold(out, 40, 255, cv2.THRESH_BINARY)
-
-    # out = np.concatenate((green1 ,out , green2), axis = 1)
-    #
-    #
-    # plt.imshow(thresh,cmap='gray')
+    # print(mean)
+    # gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    # out = np.concatenate((gray,mask,mask4,out), axis = 1)
+    # plt.imshow(out,cmap='gray')
     # plt.show()
+
+    if(mean > 30):
+        return 1
+    return 0
+
+def testRotation(img1,img2,componentCode):
+
+
+    # kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]], dtype=np.float32)
+    #
+    # imgLaplacian = cv2.filter2D(img2, cv2.CV_32F, kernel)
+    # sharp = np.float32(img2)
+    # img2 = sharp - imgLaplacian
+    #
+    # img2 = np.clip(img2, 0, 255)
+    # img2 = img2.astype('uint8')
+
+
+    # CIE = cv2.cvtColor(img2, cv2.COLOR_BGR2LAB)
+    #
+    #
+    # lower = np.array([100, 125, 125], dtype = "uint8")
+    # upper = np.array([160, 130, 130], dtype = "uint8")
+    # maskCIE = cv2.inRange(CIE, lower, upper)
+
+
+    out = np.concatenate((img1,img2), axis = 1)
+    # print(CIE[45, 77,:])
+
+    # circle = cv2.HoughCircles(maskCIE, cv2.HOUGH_GRADIENT, 0.5, 20, param1=50,param2=10,minRadius=0,maxRadius=15)
+    # print(circle)
+    # for i in circle[0,:]:
+    #     # draw the outer circle
+    #     cv2.circle(img2,(i[0],i[1]),i[2],(0,255,0),2)
+    #     # draw the center of the circle
+    #     cv2.circle(img2,(i[0],i[1]),2,(0,0,255),3)
+
+    plt.imshow(img2)
+    plt.show()

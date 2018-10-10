@@ -6,12 +6,12 @@ from matplotlib import pyplot as plt
 
 def calculate(imgList1, imgList2):
 
-    print('Test1', '\tTest2', '\tTest3','\tTest5')
+    print('Test1', '\tTest2', '\tTest3', '\tTest5', '\tTest6')
     # len(imgList1)
-    for i in range(len(imgList1) - 1):
+    for i in range(2):
 
-        original1 = imgList1[i + 1]
-        original2 = imgList2[i + 1]
+        original1 = imgList1[i]
+        original2 = imgList2[i]
 
         img1 = cv2.cvtColor(original1, cv2.COLOR_BGR2GRAY).astype(np.float64)
         img2 = cv2.cvtColor(original2, cv2.COLOR_BGR2GRAY).astype(np.float64)
@@ -71,21 +71,6 @@ def calculate(imgList1, imgList2):
         # plt.imshow(x)
         # plt.show()
 
-        # print(test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2))
+        # print(test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2),'\t',test.test6(original1,original2))
 
-        test.test6(original1,original2)
-
-        # gray = np.float32(img1)
-        # dst = cv2.cornerHarris(gray,2,3,0.2)
-        # original1[dst>0.01*dst.max()]=[0,0,255]
-        # plt.figure('harris 1')
-        # plt.imshow(original1)
-
-        # gray = np.float32(img2)
-        # dst = cv2.cornerHarris(gray,2,3,0.2)
-        # original2[dst>0.01*dst.max()]=[0,0,255]
-        # plt.figure('harris 2')
-        # plt.imshow(original2)
-
-        # gray1 = cv2.Canny(img1,50,100)
-        # gray2 = cv2.Canny(img2,50,100)
+        test.testRotation(original1,original2,'I')

@@ -26,18 +26,18 @@ def getRotation(img, printCircle):
     # circle3 = cv2.HoughCircles(mask3, cv2.HOUGH_GRADIENT, 1.6, 50, param1=50,param2=30,minRadius=60,maxRadius=100)
 
     # circles = np.hstack((circle1,circle2,circle3))
-    
+
 
     if circle1 is not None and printCircle == 1:
-        circles = np.uint16(np.around(circle1))
+        # circles = np.uint16(np.around(circle1))
         
         for i in circle1[0,:]:
             # draw the outer circle
             cv2.circle(img,(i[0],i[1]),i[2],(0,255,0),2)
             # draw the center of the circle
             cv2.circle(img,(i[0],i[1]),2,(0,0,255),3)
-        
-        
+
+
     circle1 = circle1[0][0] # LIGHT BLUE
     # circle2 = circle2[0][0] # PINK
     # circle3 = circle3[0][0] # YELLOW
