@@ -66,7 +66,8 @@ def main(imgName):
         img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
     x, originX, originY = rotation.getRotation(img, 1)
-
+    # plt.imshow(img)
+    # plt.show()
     imgList = locateComponents.locate(img, originX, originY)
     i = 0
 

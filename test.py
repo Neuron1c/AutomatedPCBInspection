@@ -351,15 +351,15 @@ def test6(img1,img2):
     for cnt in contours:
 
         approx = cv2.approxPolyDP(cnt,0.1*cv2.arcLength(cnt,True),True)
-        # cv2.drawContours(mask2,approx,-1,[125],3)
-        if len(approx)==4:
+        
+        if len(approx)!=1 and len(approx)!=2:
             count += 1
             rect = cv2.minAreaRect(cnt)
             width = rect[1][0]
             height = rect[1][1]
 
             if ((width >= 2) and (height > 2)):
-                # cv2.drawContours(img1,[x - 10 for x in cnt],-1,(0,0,255),3)
+                
                 if flag:
                     square = approx[:]
                     indSquare = approx[:]
@@ -371,29 +371,22 @@ def test6(img1,img2):
                     # indSquare = np.stack((indSquare, approx), axis = 1)
                     indSquare.append(approx)
 
-                # count += 1
-    # print(indSquare, count)
-    # for i in range(count):
 
+    
 
-    # contours[:] = [x - 10 for x in contours]
-    # cv2.drawContours(img1,contours,-1,(0,0,255), 3)
     if(indSquare == None):
-        return 0
+        return -1
 
     for sqr in indSquare:
-        rect = cv2.minAreaRect(sqr[:,0,:])
-        box = cv2.boxPoints(rect)
-        box = np.int0(box - 10)
-        cv2.drawContours(mask, [box], 0,(255),-1)
+        rect = cv2.boundingRect(sqr[:,0,:])
+        x,y,w,h = rect
+        cv2.rectangle(mask, (x-10,y-10),(x+w-10,y+h-10),(255),-1)
 
     rect = cv2.minAreaRect(square)
     box = cv2.boxPoints(rect)
     box = np.int0(box-10)
     mask3 = np.array(mask)
 
-    # cv2.drawContours(mask,[box1],0,(255),-1)
-    # cv2.drawContours(mask,[box2],0,(255),-1)
     cv2.drawContours(mask3,[box],0,(255),-1)
 
     mask = 255 - mask
@@ -435,7 +428,13 @@ def test6(img1,img2):
     mask4 = np.clip(mask4,0,255) - mask.astype(int)
 
     # x = np.clip(out.astype(int) + mask4.astype(int), 0,255)
-
+    # gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+    something = np.concatenate((img2,img1),axis = 1)
+    plt.figure('1')
+    plt.imshow(mask4)
+    plt.figure('2')
+    plt.imshow(something)
+    plt.show()
 
     count = 0
     mean = 0
@@ -450,6 +449,7 @@ def test6(img1,img2):
                 out[i,j] = 0
 
     mean = mean/count
+
     # print(mean)
     # gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     # out = np.concatenate((gray,mask,mask4,out), axis = 1)
