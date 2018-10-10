@@ -351,7 +351,7 @@ def test6(img1,img2):
     for cnt in contours:
 
         approx = cv2.approxPolyDP(cnt,0.1*cv2.arcLength(cnt,True),True)
-        
+
         if len(approx)!=1 and len(approx)!=2:
             count += 1
             rect = cv2.minAreaRect(cnt)
@@ -359,7 +359,7 @@ def test6(img1,img2):
             height = rect[1][1]
 
             if ((width >= 2) and (height > 2)):
-                
+
                 if flag:
                     square = approx[:]
                     indSquare = approx[:]
@@ -372,7 +372,7 @@ def test6(img1,img2):
                     indSquare.append(approx)
 
 
-    
+
 
     if(indSquare == None):
         return -1
