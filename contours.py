@@ -34,6 +34,22 @@ def main(imgName):
 
     img = cv2.imread(imgName)
 
+    mtx = np.load('mtx.npy')
+    dist = np.load('dist.npy')
+
+    h,  w = img.shape[:2]
+    newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
+
+    # undistort
+    dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
+
+    # crop the image
+    x,y,w,h = roi
+    dst = dst[y:y+h, x:x+w]
+    cv2.imwrite('calibresult.png',dst)
+
+    img = cv2.imread('calibresult.png')
+    
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     ret, thresh = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY_INV)
