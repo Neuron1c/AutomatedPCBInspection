@@ -8,10 +8,10 @@ def calculate(imgList1, imgList2):
 
     print('Test1', '\tTest2', '\tTest3', '\tTest5', '\tTest6')
     # len(imgList1)
-    for i in range(len(imgList1)):
+    for i in range(1):
 
-        original1 = imgList1[i]
-        original2 = imgList2[i]
+        original1 = imgList1[i + 5]
+        original2 = imgList2[i + 5]
 
         img1 = cv2.cvtColor(original1, cv2.COLOR_BGR2GRAY).astype(np.float64)
         img2 = cv2.cvtColor(original2, cv2.COLOR_BGR2GRAY).astype(np.float64)
@@ -71,6 +71,6 @@ def calculate(imgList1, imgList2):
         # plt.imshow(x)
         # plt.show()
 
-        print(test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2),'\t',test.test6(original1,original2))
-
+        # print(test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2),'\t',test.test6(original1,original2))
+        test.test4(original1,original2)
         # test.testRotation(original1,original2,'I')

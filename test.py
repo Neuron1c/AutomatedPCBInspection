@@ -147,10 +147,11 @@ def test3(img1,img2): #CORRELATION TEST
 
 def test4(img1,img2):
 
+    test = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
     kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]], dtype=np.float32)
 
-    imgLaplacian = cv2.filter2D(img2, cv2.CV_32F, kernel)
-    sharp = np.float32(img2)
+    imgLaplacian = cv2.filter2D(test, cv2.CV_32F, kernel)
+    sharp = np.float32(test)
     imgResult = sharp - imgLaplacian
 
     imgResult = np.clip(imgResult, 0, 255)
@@ -159,9 +160,11 @@ def test4(img1,img2):
     imgLaplacian = np.uint8(imgLaplacian)
 
     bw = cv2.cvtColor(imgResult, cv2.COLOR_BGR2GRAY)
-    _, bw = cv2.threshold(bw, 150, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
-
     # img2 = imgResult
+    _, bw = cv2.threshold(bw, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+    
+    plt.imshow(bw)
+    plt.show()
 
     width, height, depth = img2.shape
     width = np.round(width/2).astype(int)
@@ -302,6 +305,7 @@ def test5(img1,img2):
 
     RGB1 = np.array(RGB1)/(x1*y1)
     RGB2 = np.array(RGB2)/(x2*y2)
+
     # print(RGB1[0])
     # print(RGB2[0])
     # print()
@@ -324,22 +328,22 @@ def test6(img1,img2):
     upper = np.array([255, 255, 255], dtype = "uint8")
     mask = cv2.inRange(img1, lower, upper)
 
-    kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]], dtype=np.float32)
+    # kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]], dtype=np.float32)
 
-    imgLaplacian = cv2.filter2D(img1, cv2.CV_32F, kernel)
-    sharp = np.float32(img1)
-    img1 = sharp - imgLaplacian
+    # imgLaplacian = cv2.filter2D(img1, cv2.CV_32F, kernel)
+    # sharp = np.float32(img1)
+    # img1 = sharp - imgLaplacian
 
-    img1 = np.clip(img1, 0, 255)
-    img1 = img1.astype('uint8')
+    # img1 = np.clip(img1, 0, 255)
+    # img1 = img1.astype('uint8')
 
 
-    imgLaplacian = cv2.filter2D(img2, cv2.CV_32F, kernel)
-    sharp = np.float32(img2)
-    img2 = sharp - imgLaplacian
+    # imgLaplacian = cv2.filter2D(img2, cv2.CV_32F, kernel)
+    # sharp = np.float32(img2)
+    # img2 = sharp - imgLaplacian
 
-    img2 = np.clip(img2, 0, 255)
-    img2 = img2.astype('uint8')
+    # img2 = np.clip(img2, 0, 255)
+    # img2 = img2.astype('uint8')
 
     mask2 = np.pad(mask,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))
 
@@ -391,50 +395,55 @@ def test6(img1,img2):
 
     mask = 255 - mask
 
-    green1 = img1[:,:,1].astype(int)
-    green2 = img2[:,:,1].astype(int)
+    green1 = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)[:,:,1].astype(int)
+    green2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)[:,:,1].astype(int)
+
+    # green1 = img1[:,:,1].astype(int)
+    # green2 = img2[:,:,1].astype(int)
 
 
     height, width = green1.shape
-    count = 0
-    mean1 = 0
-    mean2 = 0
-    for i in range(height):
-        for j in range(width):
+    # count = 0
+    # mean1 = 0
+    # mean2 = 0
+    # for i in range(height):
+    #     for j in range(width):
 
-            if(mask3[i,j] == 0):
-                count += 1
-                mean1 += green1[i,j]
-                mean2 += green2[i,j]
+    #         if(mask3[i,j] == 0):
+    #             count += 1
+    #             mean1 += green1[i,j]
+    #             mean2 += green2[i,j]
 
-    mean1 = mean1/count
-    mean2 = mean2/count
+    # mean1 = mean1/count
+    # mean2 = mean2/count
     # print(mean1,mean2)
 
     # mean1 = np.mean(green1)
     # mean2 = np.mean(green2)
 
-    green2 = green2.astype(int) + (mean1 - mean2)
-    green2 = np.clip(green2,0,255).astype('uint8')
-    green1 = green1.astype('uint8')
+    # green2 = green2.astype(int) + (mean1 - mean2)
+    # green2 = np.clip(green2,0,255).astype('uint8')
+    # green1 = green1.astype('uint8')
     mask = mask.astype('uint8')
 
-    out = cv2.subtract(green2,green1, mask = mask)
+    out = cv2.subtract(green1,green2, mask = mask)
+    out = np.clip(out,0,255)
     out = np.round(out).astype('uint8')
 
 
     mask = 255 - mask
     mask4 = np.array(mask3.astype(int) + mask.astype(int))
     mask4 = np.clip(mask4,0,255) - mask.astype(int)
+    mask4 = mask4.astype('uint8')
+
+    dist = cv2.distanceTransform(mask4, cv2.DIST_L2, 3)
+    cv2.normalize(dist, dist, 0, 1.0, cv2.NORM_MINMAX)
+
+    _, mask4 = cv2.threshold(dist, 0.4, 1.0, cv2.THRESH_BINARY)
 
     # x = np.clip(out.astype(int) + mask4.astype(int), 0,255)
     # gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-    something = np.concatenate((img2,img1),axis = 1)
-    plt.figure('1')
-    plt.imshow(mask4)
-    plt.figure('2')
-    plt.imshow(something)
-    plt.show()
+    
 
     count = 0
     mean = 0
@@ -455,8 +464,26 @@ def test6(img1,img2):
     # out = np.concatenate((gray,mask,mask4,out), axis = 1)
     # plt.imshow(out,cmap='gray')
     # plt.show()
+    # print(mean)
 
-    if(mean > 30):
+    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
+    kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]], dtype=np.float32)
+    imgLaplacian = cv2.filter2D(img2, cv2.CV_32F, kernel)
+    sharp = np.float32(img2)
+    img2 = sharp - imgLaplacian
+
+    img2 = np.clip(img2, 0, 255)
+    img2 = img2.astype('uint8')
+
+    H = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)[:,:,0]
+    S = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)[:,:,1]
+    V = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)[:,:,2]
+
+    something = np.concatenate((H,S,V),axis = 1)
+    plt.imshow(something)
+    plt.show()
+
+    if(mean > 50):
         return 1
     return 0
 

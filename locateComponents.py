@@ -61,19 +61,19 @@ def locate(img, originX, originY):
 
                 if(float(row[4]) == 90 or float(row[4]) == 270):
 
-                    corner1x = int(x - np.round(compWidth*ratio + ratio))
-                    corner1y = int(y - np.round(compHeight*ratio + ratio))
+                    corner1x = int(x - np.round(compWidth*ratio + ratio*1.1))
+                    corner1y = int(y - np.round(compHeight*ratio + ratio*1.1))
 
-                    corner2x = int(x + np.round(compWidth*ratio + ratio))
-                    corner2y = int(y + np.round(compHeight*ratio + ratio))
+                    corner2x = int(x + np.round(compWidth*ratio + ratio*1.1))
+                    corner2y = int(y + np.round(compHeight*ratio + ratio*1.1))
 
                 else:
 
-                    corner1x = int(x - np.round(compHeight*ratio + ratio))
-                    corner1y = int(y - np.round(compWidth*ratio + ratio))
+                    corner1x = int(x - np.round(compHeight*ratio + ratio*1.1))
+                    corner1y = int(y - np.round(compWidth*ratio + ratio*1.1))
 
-                    corner2x = int(x + np.round(compHeight*ratio + ratio))
-                    corner2y = int(y + np.round(compWidth*ratio + ratio))
+                    corner2x = int(x + np.round(compHeight*ratio + ratio*1.1))
+                    corner2y = int(y + np.round(compWidth*ratio + ratio*1.1))
 
                 rectangle = img[corner1y:corner2y,corner1x:corner2x]
 
