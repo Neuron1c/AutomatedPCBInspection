@@ -1,17 +1,34 @@
 import scipy.signal
 import numpy as np
 import cv2
+import csv
 import test
 from matplotlib import pyplot as plt
 
 def calculate(imgList1, imgList2):
 
+    with open('pnp.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            if line_count == 0:
+
+                line_count += 1
+            else:
+                if line_count == 1 :
+                    rotation = [row[4]]
+                    line_count += 1
+                else:
+                    rotation.append(row[4])
+                    line_count += 1
+
     print('Test1', '\tTest2', '\tTest3', '\tTest5', '\tTest6')
     # len(imgList1)
-    for i in range(1):
+    count = 1
+    for i in range(len(imgList1) - 2):
 
-        original1 = imgList1[i + 5]
-        original2 = imgList2[i + 5]
+        original1 = imgList1[i + 2]
+        original2 = imgList2[i + 2]
 
         img1 = cv2.cvtColor(original1, cv2.COLOR_BGR2GRAY).astype(np.float64)
         img2 = cv2.cvtColor(original2, cv2.COLOR_BGR2GRAY).astype(np.float64)
@@ -70,7 +87,20 @@ def calculate(imgList1, imgList2):
         # x = np.concatenate(original1,original2)
         # plt.imshow(x)
         # plt.show()
+        #
+        temp = original2[:]
+
+        if(int(rotation[i]) == 90 or int(rotation[i]) == 270):
+            temp = cv2.rotate(temp, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+        # if(test.test2(original1,original2)):
+        #
+        #     # print(count)
+        #     location = "validationSet/emptyResistor/1_" + str(count) + ".jpg"
+        #     cv2.imwrite(location, temp)
+        #     count += 1
+
 
         # print(test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2),'\t',test.test6(original1,original2))
-        test.test4(original1,original2)
+        test.test7(temp)
         # test.testRotation(original1,original2,'I')
