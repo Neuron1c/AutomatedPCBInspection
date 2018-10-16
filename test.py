@@ -523,12 +523,16 @@ def test6(img1,img2):
         return 1
     return 0
 
-def test7(img2):
+def test7(img2, code):
 
     # img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
     # img2 = cv2.resize(img2, (128,128), interpolation = cv2.INTER_CUBIC)
     # img2 = np.swapaxes(img2, 0,2)
     # img2 = np.swapaxes(img2, 1,2)
+
+    if(code[0] != 'R'):
+        return -1
+
     cv2.imwrite('temp/temp/pls.jpg', img2)
 
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -570,7 +574,8 @@ def test7(img2):
         outputs = model(images)
         _, predicted = torch.max(outputs.data, 1)
 
-    print(predicted.numpy()[0])
+    return predicted.numpy()[0]
+
 def testRotation(img1,img2,componentCode):
 
 

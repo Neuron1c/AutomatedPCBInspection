@@ -17,18 +17,20 @@ def calculate(imgList1, imgList2):
             else:
                 if line_count == 1 :
                     rotation = [row[4]]
+                    code = [row[0]]
                     line_count += 1
                 else:
                     rotation.append(row[4])
+                    code.append(row[0])
                     line_count += 1
 
-    print('Test1', '\tTest2', '\tTest3', '\tTest5', '\tTest6')
+    print('Code','\tTest1', '\tTest2', '\tTest3', '\tTest5', '\tTest6','\tTest7')
     # len(imgList1)
     count = 1
-    for i in range(len(imgList1) - 2):
+    for i in range(len(imgList1)):
 
-        original1 = imgList1[i + 2]
-        original2 = imgList2[i + 2]
+        original1 = imgList1[i]
+        original2 = imgList2[i]
 
         img1 = cv2.cvtColor(original1, cv2.COLOR_BGR2GRAY).astype(np.float64)
         img2 = cv2.cvtColor(original2, cv2.COLOR_BGR2GRAY).astype(np.float64)
@@ -101,6 +103,6 @@ def calculate(imgList1, imgList2):
         #     count += 1
 
 
-        # print(test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2),'\t',test.test6(original1,original2))
-        test.test7(temp)
+        print(code[i],'\t',test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2),'\t',test.test6(original1,original2),'\t',test.test7(temp,code[i]))
+        # print(test.test7(temp, code[i]))
         # test.testRotation(original1,original2,'I')

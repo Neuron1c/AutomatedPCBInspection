@@ -49,7 +49,7 @@ def main(imgName):
     cv2.imwrite('calibresult.png',dst)
 
     img = cv2.imread('calibresult.png')
-    
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     ret, thresh = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY_INV)
@@ -99,5 +99,5 @@ def main(imgName):
     # plt.show()
 
 baseImgList = main('golden.jpg')
-newImgList =  main('test1.jpg')
+newImgList =  main('test2.jpg')
 correlate.calculate(baseImgList, newImgList)

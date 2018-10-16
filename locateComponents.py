@@ -44,7 +44,7 @@ def locate(img, originX, originY):
                 line_count += 1
             else:
 
-                if(row[0][:1] == 'R'):
+                if(row[0][:1] == 'R' or row[0][:1] == 'C'):
                     compWidth, compHeight = componentDimensions(int(row[5]))
                     # print(compWidth, compHeight, ratio)
 
