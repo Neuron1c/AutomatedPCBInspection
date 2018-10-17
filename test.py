@@ -521,7 +521,7 @@ def test7(img2, code, model):
         train_dataset = torchvision.datasets.ImageFolder(
             root=data_path,
             transform = torchvision.transforms.Compose([
-                                 transforms.Resize(128),
+                                 transforms.Scale(128),
                                  transforms.CenterCrop(128),
                                  transforms.ToTensor(),
                                  normalize,

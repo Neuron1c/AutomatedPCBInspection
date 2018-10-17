@@ -3,6 +3,8 @@ import numpy as np
 import cv2
 import csv
 import test
+import directoryFinder
+
 from matplotlib import pyplot as plt
 
 from model import Net
@@ -32,15 +34,19 @@ def calculate(imgList1, imgList2):
                 if line_count == 1 :
                     rotation = [row[4]]
                     code = [row[0]]
+                    present = [row[7]]
                     line_count += 1
                 else:
                     rotation.append(row[4])
                     code.append(row[0])
+                    present.append(row[7])
                     line_count += 1
 
     print('Code','\tTest1', '\tTest2', '\tTest3', '\tTest5', '\tTest6','\tTest7')
     # len(imgList1)
-    count = 1
+    mypath = 'trainingSet/2/'
+    count = directoryFinder.getLastCount(mypath)
+
     for i in range(len(imgList1)):
 
         original1 = imgList1[i]
@@ -109,12 +115,13 @@ def calculate(imgList1, imgList2):
         if(int(rotation[i]) == 90 or int(rotation[i]) == 270):
             temp = cv2.rotate(temp, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-        # if(code[i][0] == 'C'):
-        #
+        # if(code[i][0] == 'C' and present[i] == "YES"):
+        #     print(count)
         #     # print(count)
-        #     location = "trainingSet/Capacitor/1_" + str(count) + ".jpg"
+        #     location = mypath + str(count) + ".jpg"
         #     cv2.imwrite(location, temp)
         #     count += 1
+
 
 
         print(code[i],'\t',test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2),'\t',test.test6(original1,original2),'\t',test.test7(temp,code[i],model))

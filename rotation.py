@@ -5,10 +5,12 @@ from matplotlib import pyplot as plt
 def getRotation(img, printCircle):
 
     # LIGHT BLUE
-    lower = np.array([190, 130, 60], dtype = "uint8")
-    upper = np.array([230, 220, 140], dtype = "uint8")
+    lower = np.array([200, 200, 170], dtype = "uint8")
+    upper = np.array([255, 255, 200], dtype = "uint8")
     mask1 = cv2.inRange(img, lower, upper)
 
+    # plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    # plt.show()
 
     # # PINK
     # lower = np.array([110, 70, 215], dtype = "uint8")
@@ -30,7 +32,7 @@ def getRotation(img, printCircle):
 
     if circle1 is not None and printCircle == 1:
         # circles = np.uint16(np.around(circle1))
-        
+
         for i in circle1[0,:]:
             # draw the outer circle
             cv2.circle(img,(i[0],i[1]),i[2],(0,255,0),2)

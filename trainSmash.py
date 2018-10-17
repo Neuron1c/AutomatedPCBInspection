@@ -102,7 +102,7 @@ for epoch in range(50):  # loop over the dataset multiple times
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-                print(running_loss, (100 * correct / total))
+                print(epoch ,running_loss, (100 * correct / total))
         # if i % 2000 == 1999:    # print every 2000 mini-batches
         #     print('[%d, %5d] loss: %.3f' %
         #           (epoch + 1, i + 1, running_loss / 2000))

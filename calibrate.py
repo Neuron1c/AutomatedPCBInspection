@@ -29,6 +29,7 @@ for fname in images:
 
     # Find the chess board corners
     ret, corners = cv2.findChessboardCorners(gray, (x,y),None)
+    print(corners.shape)
     print(ret)
     # If found, add object points, image points (after refining them)
     if ret == True:
@@ -48,8 +49,8 @@ ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.sh
 
 
 # print(mtx,dist)
-np.save('mtx',mtx)
-np.save('dist',dist)
+# np.save('mtx',mtx)
+# np.save('dist',dist)
 
 img = cv2.imread('test2.jpg')
 h,  w = img.shape[:2]
