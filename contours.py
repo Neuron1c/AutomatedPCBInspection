@@ -99,5 +99,5 @@ def main(imgName):
     # plt.show()
 
 baseImgList = main('golden.jpg')
-newImgList =  main('test2.jpg')
+newImgList =  main('test1.jpg')
 correlate.calculate(baseImgList, newImgList)

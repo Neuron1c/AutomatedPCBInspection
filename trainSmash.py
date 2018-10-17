@@ -1,9 +1,13 @@
 import torch
 import torchvision
 import torchvision.transforms as transforms
-
+from model import Net
 import matplotlib.pyplot as plt
 import numpy as np
+
+import torch.nn as nn
+import torch.nn.functional as F
+
 
 
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -46,56 +50,19 @@ def load_valdataset():
     )
     return test_loader
 
-trainloader = load_dataset()
+
 testloader = load_valdataset()
 
-def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
-
-
 # get some random training images
-dataiter = iter(trainloader)
-images, labels = dataiter.next()
 
-print(images.shape)
 
 # print(labels)
 # show images
 # imshow(torchvision.utils.make_grid(images))
 
-import torch.nn as nn
-import torch.nn.functional as F
-
-
-class Net(nn.Module):
-    def __init__(self):
-
-        super(Net, self).__init__()
-        self.layer1 = nn.Sequential(
-                                    nn.Conv2d(3, 32, kernel_size=5, stride=1, padding=2),
-                                    nn.ReLU(),
-                                    nn.MaxPool2d(kernel_size=2, stride=2))
-        self.layer2 = nn.Sequential(
-                                    nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
-                                    nn.ReLU(),
-                                    nn.MaxPool2d(kernel_size=2, stride=2))
-        self.drop_out = nn.Dropout()
-        self.fc1 = nn.Linear(32 * 32 * 64, 1000)
-        self.fc2 = nn.Linear(1000, 100)
-        self.fc3 = nn.Linear(100, 2)
-
-    def forward(self, x):
-        out = self.layer1(x)
-        out = self.layer2(out)
-        out = out.reshape(out.size(0), -1)
-        out = self.drop_out(out)
-        out = self.fc1(out)
-        out = self.fc2(out)
-        out = self.fc3(out)
-        return out
+trainloader = load_dataset()
+dataiter = iter(trainloader)
+images, labels = dataiter.next()
 
 net = Net()
 
@@ -105,6 +72,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 for epoch in range(50):  # loop over the dataset multiple times
+
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):

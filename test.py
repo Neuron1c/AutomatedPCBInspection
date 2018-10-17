@@ -11,32 +11,6 @@ import torch.utils.data as utils
 import torch.nn as nn
 import torch.nn.functional as F
 
-class Net(nn.Module):
-    def __init__(self):
-
-        super(Net, self).__init__()
-        self.layer1 = nn.Sequential(
-                                    nn.Conv2d(3, 32, kernel_size=5, stride=1, padding=2),
-                                    nn.ReLU(),
-                                    nn.MaxPool2d(kernel_size=2, stride=2))
-        self.layer2 = nn.Sequential(
-                                    nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
-                                    nn.ReLU(),
-                                    nn.MaxPool2d(kernel_size=2, stride=2))
-        self.drop_out = nn.Dropout()
-        self.fc1 = nn.Linear(32 * 32 * 64, 1000)
-        self.fc2 = nn.Linear(1000, 100)
-        self.fc3 = nn.Linear(100, 2)
-
-    def forward(self, x):
-        out = self.layer1(x)
-        out = self.layer2(out)
-        out = out.reshape(out.size(0), -1)
-        out = self.drop_out(out)
-        out = self.fc1(out)
-        out = self.fc2(out)
-        out = self.fc3(out)
-        return out
 
 def test1(img1,img2): #SIMPLE COLOUR GRAB USING HSV
 
@@ -523,24 +497,21 @@ def test6(img1,img2):
         return 1
     return 0
 
-def test7(img2, code):
+def test7(img2, code, model):
 
     # img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
     # img2 = cv2.resize(img2, (128,128), interpolation = cv2.INTER_CUBIC)
     # img2 = np.swapaxes(img2, 0,2)
     # img2 = np.swapaxes(img2, 1,2)
 
-    if(code[0] != 'R'):
+    if(code[0] != 'R' and code[0] != 'C'):
         return -1
 
     cv2.imwrite('temp/temp/pls.jpg', img2)
 
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-    model = Net()
 
-    model.load_state_dict(torch.load('convNet'))
-    model.eval()
 
     dataset = utils.TensorDataset(torch.from_numpy(img2))
 
@@ -550,7 +521,7 @@ def test7(img2, code):
         train_dataset = torchvision.datasets.ImageFolder(
             root=data_path,
             transform = torchvision.transforms.Compose([
-                                 transforms.Scale(128),
+                                 transforms.Resize(128),
                                  transforms.CenterCrop(128),
                                  transforms.ToTensor(),
                                  normalize,
