@@ -49,10 +49,10 @@ ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.sh
 
 
 # print(mtx,dist)
-# np.save('mtx',mtx)
-# np.save('dist',dist)
+np.save('mtx',mtx)
+np.save('dist',dist)
 
-img = cv2.imread('test2.jpg')
+img = cv2.imread('checker.jpg')
 h,  w = img.shape[:2]
 newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
 
@@ -62,4 +62,39 @@ dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
 # crop the image
 x,y,w,h = roi
 dst = dst[y:y+h, x:x+w]
-cv2.imwrite('calibresult.png',dst)
+
+img = cv2.resize(dst,None,fx=0.5, fy=0.5, interpolation = cv2.INTER_CUBIC)
+gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+x = 10
+y = 7
+
+ret, corners = cv2.findChessboardCorners(gray, (x,y),None)
+# print(corners[0,0])
+
+cv2.drawChessboardCorners(img, (x,y), corners,ret)
+plt.imshow(img)
+plt.show()
+
+count = 0
+hyp = 0
+
+for i in range(7):
+    for j in range(9):
+
+        count += 1
+        off = i*10 + j
+
+        x = corners[off, 0, 0] - corners[off + 1, 0, 0]
+        y = corners[off, 0, 1] - corners[off + 1, 0, 1]
+        
+        hyp += np.sqrt(x*x + y*y)
+        # print(count, hyp/count)
+
+
+hyp = hyp/count
+
+hyp = (hyp/10)*2
+
+np.save('hyp',hyp)
+# cv2.imwrite('calibresult.png',dst)

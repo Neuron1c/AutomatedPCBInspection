@@ -30,6 +30,8 @@ def locate(img, originX, originY):
 
     ratio = (ratioX+ratioY)/2
 
+    ratio = np.load('hyp.npy')
+
     originX = round(originX)
     originY = round(originY)
 

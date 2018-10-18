@@ -9,7 +9,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(device)
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
 def load_dataset():
@@ -17,8 +18,9 @@ def load_dataset():
     train_dataset = torchvision.datasets.ImageFolder(
         root=data_path,
         transform = torchvision.transforms.Compose([
-                             transforms.Scale(128),
-                             transforms.CenterCrop(128),
+                             transforms.Resize(64),
+                             transforms.CenterCrop(64),
+                             transforms.ColorJitter(0.2,0.2,0.2,0.01),
                              transforms.ToTensor(),
                              normalize,
                          ])
@@ -36,8 +38,8 @@ def load_valdataset():
     test_dataset = torchvision.datasets.ImageFolder(
         root=data_path,
         transform = torchvision.transforms.Compose([
-                             transforms.Scale(128),
-                             transforms.CenterCrop(128),
+                             transforms.Resize(64),
+                             transforms.CenterCrop(64),
                              transforms.ToTensor(),
                              normalize,
                          ])
@@ -60,16 +62,32 @@ testloader = load_valdataset()
 # show images
 # imshow(torchvision.utils.make_grid(images))
 
-trainloader = load_dataset()
-dataiter = iter(trainloader)
-images, labels = dataiter.next()
+
 
 net = Net()
+net.to(device)
+
 
 import torch.optim as optim
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+
+trainloader = load_dataset()
+dataiter = iter(trainloader)
+images, labels = dataiter.next()
+
+
+def imshow(img):
+    img = img / 2 + 0.5     # unnormalize
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.show()
+
+
+# show images
+# imshow(torchvision.utils.make_grid(images))
+
 
 for epoch in range(50):  # loop over the dataset multiple times
 
@@ -78,7 +96,7 @@ for epoch in range(50):  # loop over the dataset multiple times
     for i, data in enumerate(trainloader, 0):
         # get the inputs
         inputs, labels = data
-
+        inputs, labels = inputs.to(device), labels.to(device)
         # zero the parameter gradients
         optimizer.zero_grad()
 
@@ -91,24 +109,26 @@ for epoch in range(50):  # loop over the dataset multiple times
         # print statistics
         running_loss += loss.item()
 
-
+        # print(epoch)
         correct = 0
         total = 0
         with torch.no_grad():
             for data in testloader:
                 images, labels = data
-                outputs = net(images)
+                images, labels = images.to(device), labels.to(device)
+                outputs = net(images).to(device)
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
                 print(epoch ,running_loss, (100 * correct / total))
-        # if i % 2000 == 1999:    # print every 2000 mini-batches
-        #     print('[%d, %5d] loss: %.3f' %
-        #           (epoch + 1, i + 1, running_loss / 2000))
-        #     running_loss = 0.0
 
-torch.save(net.state_dict(), 'convNet')
+        if i % 2000 == 1999:    # print every 2000 mini-batches
+            print('[%d, %5d] loss: %.3f' %
+                  (epoch + 1, i + 1, running_loss / 2000))
+            running_loss = 0.0
+
+torch.save(net.state_dict(), 'convNet.een')
 
 print('Finished Training')
 
@@ -117,7 +137,8 @@ total = 0
 with torch.no_grad():
     for data in testloader:
         images, labels = data
-        outputs = net(images)
+        images, labels = images.to(device), labels.to(device)
+        outputs = net(images).to(device)
         print(outputs)
         _, predicted = torch.max(outputs.data, 1)
         print(predicted)

@@ -149,8 +149,9 @@ def test3(img1,img2): #CORRELATION TEST
 
     corr = scipy.signal.correlate2d(img1, img2)
     corrMax = np.unravel_index(np.argmax(corr), corr.shape)
+    # return (corr[corrMax]/area)
 
-    if(corr[corrMax]/area > 0.1):
+    if(corr[corrMax]/area > 0.15):
         return 0
     else:
         return 1
@@ -265,7 +266,7 @@ def test4(img1,img2):
     # plt.figure('2')
     # plt.imshow(img2)
 
-    plt.show()
+    # plt.show()
 
 def test5(img1,img2):
 
@@ -274,6 +275,9 @@ def test5(img1,img2):
 
     y1,x1,_ = img1.shape
     y2,x2,_ = img2.shape
+
+    img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
+    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
 
     R = img1[:,:,2]
     G = img1[:,:,1]
@@ -316,9 +320,13 @@ def test5(img1,img2):
     RGB1 = np.array(RGB1)/(x1*y1)
     RGB2 = np.array(RGB2)/(x2*y2)
 
-    # print(RGB1[0])
-    # print(RGB2[0])
     # print()
+    pls = np.abs(RGB1[0] - RGB2[0])
+    maxInd = np.unravel_index(np.argmax(pls), pls.shape)
+    print(pls[maxInd])
+    # plt.imshow(np.concatenate((img1[:,:,1],img2[:,:,1])))
+    # plt.show()
+
     # x = np.zeros(20)
 
     # vals = np.linspace(0.17,0.2,20)
@@ -328,7 +336,7 @@ def test5(img1,img2):
 
     # print(x)
 
-    if(np.allclose(RGB1,RGB2, 0 ,0.18)):
+    if(np.allclose(RGB1[0],RGB2[0], 0 ,0.05)):
         return 0
     return 1
 
@@ -446,6 +454,7 @@ def test6(img1,img2):
     mask4 = np.clip(mask4,0,255) - mask.astype(int)
     mask4 = mask4.astype('uint8')
 
+
     dist = cv2.distanceTransform(mask4, cv2.DIST_L2, 3)
     cv2.normalize(dist, dist, 0, 1.0, cv2.NORM_MINMAX)
 
@@ -467,6 +476,10 @@ def test6(img1,img2):
             else:
                 out[i,j] = 0
 
+    if(count == 0):
+        return -1
+        plt.imshow(np.concatenate((mask,mask4)))
+        plt.show()
     mean = mean/count
 
     # print(mean)
@@ -521,8 +534,8 @@ def test7(img2, code, model):
         train_dataset = torchvision.datasets.ImageFolder(
             root=data_path,
             transform = torchvision.transforms.Compose([
-                                 transforms.Scale(128),
-                                 transforms.CenterCrop(128),
+                                 transforms.Resize(64),
+                                 transforms.CenterCrop(64),
                                  transforms.ToTensor(),
                                  normalize,
                              ])

@@ -46,16 +46,16 @@ def main(imgName):
     # crop the image
     x,y,w,h = roi
     dst = dst[y:y+h, x:x+w]
-    cv2.imwrite('calibresult.png',dst)
+    # cv2.imwrite('calibresult.png',dst)
 
-    img = cv2.imread('calibresult.png')
+    img = dst
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    ret, thresh = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)
+    ret, thresh = cv2.threshold(gray, 210, 255, cv2.THRESH_BINARY_INV)
     image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
-    # plt.imshow(thresh)
+    # plt.imshow(np.concatenate((thresh,gray), axis = 1))
     # plt.show()
 
     rect = 0
@@ -101,15 +101,15 @@ def main(imgName):
     # plt.show()
 
 
-baseImgList = main('golden.jpg')
-newImgList =  main('test1.jpg')
+baseImgList = main('images/Golden/1.jpg')
+newImgList =  main('images/populated/6.jpg')
 correlate.calculate(baseImgList, newImgList)
 
 
 # import directoryFinder
 # mypath = 'images/populated/'
 # paths = directoryFinder.getList(mypath)
-#
+
 # for x in paths:
 #     baseImgList = main('golden.jpg')
 #     newImgList =  main(mypath + x)

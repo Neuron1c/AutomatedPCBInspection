@@ -19,7 +19,7 @@ import torch
 def calculate(imgList1, imgList2):
 
     model = Net()
-    model.load_state_dict(torch.load('convNet'))
+    model.load_state_dict(torch.load('convNet.een'))
     model.eval()
 
 
@@ -42,7 +42,7 @@ def calculate(imgList1, imgList2):
                     present.append(row[7])
                     line_count += 1
 
-    print('Code','\tTest1', '\tTest2', '\tTest3', '\tTest5', '\tTest6','\tTest7')
+    print('Code','\tTest1', '\tTest2', '\tTest3', '\tTest6','\tTest7')
     # len(imgList1)
     mypath = 'trainingSet/2/'
     count = directoryFinder.getLastCount(mypath)
@@ -117,13 +117,15 @@ def calculate(imgList1, imgList2):
 
         # if(code[i][0] == 'C' and present[i] == "YES"):
         #     print(count)
-        #     # print(count)
         #     location = mypath + str(count) + ".jpg"
         #     cv2.imwrite(location, temp)
         #     count += 1
 
+        
+        print(code[i],'\t',test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test6(original1,original2),'\t',test.test7(temp,code[i],model))
+        # print(present[i],test.test5(original1,original2))
+        
+        # if present[i] == 'NO':
 
-
-        print(code[i],'\t',test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test5(original1,original2),'\t',test.test6(original1,original2),'\t',test.test7(temp,code[i],model))
-        # print(test.test7(temp, code[i]))
+        
         # test.testRotation(original1,original2,'I')
