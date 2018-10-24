@@ -5,11 +5,15 @@ from matplotlib import pyplot as plt
 def getRotation(img, printCircle):
 
     # LIGHT BLUE
-    lower = np.array([200, 200, 140], dtype = "uint8")
+    lower = np.array([210, 210, 140], dtype = "uint8")
     upper = np.array([255, 255, 200], dtype = "uint8")
     mask1 = cv2.inRange(img, lower, upper)
 
-    # plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+
+    edges = cv2.Canny(mask1,100,200)
+    cv2.imwrite("1.jpg",mask1)
+    cv2.imwrite("2.jpg",edges)
+
     # plt.show()
 
     # plt.imshow(mask1)

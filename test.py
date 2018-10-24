@@ -13,6 +13,7 @@ import torch.nn.functional as F
 
 
 def test1(img1,img2): #SIMPLE COLOUR GRAB USING HSV
+    cv2.imwrite("pls.jpg", img2)
 
     img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
     img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
@@ -60,6 +61,8 @@ def test1(img1,img2): #SIMPLE COLOUR GRAB USING HSV
     # print(np.round(R1 - R2))
     # print(np.round(B1 - B2))
     # print(np.round(G1 - G2))
+
+    print(R1 - R2, B1 - B2, G1 - G2)
 
     if(R2 < R1 + 50 and R2 > R1 - 50):
         if(B2 < B1 + 30 and B2 > B1 - 30):
@@ -147,7 +150,17 @@ def test3(img1,img2): #CORRELATION TEST
         img2 = img2/(-1*min2)
 
 
-    corr = scipy.signal.correlate2d(img1, img2)
+    fft1 = np.pad(img1,((0,img2.shape[0]-1),(0,img2.shape[1]-1)),'constant',constant_values=((0, 0),(0,0)))
+    fft2 = np.pad(img2,((0,img1.shape[0]-1),(0,img1.shape[1]-1)),'constant',constant_values=((0, 0),(0,0)))
+
+    fft1 = np.fft.fft2(fft1)
+    fft2 = np.conjugate(np.fft.fft2(fft2))
+
+    corr = np.real(np.fft.ifft2(fft1*fft2))
+    corr = np.roll(corr, (corr.shape[0] - 1)//2, axis = 0)
+    corr = np.roll(corr, (corr.shape[1] - 1)//2, axis = 1)       
+
+    # corr = scipy.signal.correlate2d(img1, img2)
     corrMax = np.unravel_index(np.argmax(corr), corr.shape)
     # return (corr[corrMax]/area)
 

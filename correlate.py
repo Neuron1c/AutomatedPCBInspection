@@ -4,7 +4,8 @@ import cv2
 import csv
 import test
 import directoryFinder
-
+from numpy.fft import fft2, ifft2
+from timeit import default_timer as timer
 from matplotlib import pyplot as plt
 
 from model import Net
@@ -58,8 +59,27 @@ def calculate(imgList1, imgList2):
         gray1 = img1 - img1.mean()
         gray2 = img2 - img2.mean()
 
-        corr = scipy.signal.correlate2d(gray1, gray2)
+        # start = timer()
+
+        fft1 = np.pad(gray1,((0,gray2.shape[0]-1),(0,gray2.shape[1]-1)),'constant',constant_values=((0, 0),(0,0)))
+        fft2 = np.pad(gray2,((0,gray1.shape[0]-1),(0,gray1.shape[1]-1)),'constant',constant_values=((0, 0),(0,0)))
+
+        fft1 = np.fft.fft2(fft1)
+        fft2 = np.conjugate(np.fft.fft2(fft2))
+
+        corr = np.real(np.fft.ifft2(fft1*fft2))
+        corr = np.roll(corr, (corr.shape[0] - 1)//2, axis = 0)
+        corr = np.roll(corr, (corr.shape[1] - 1)//2, axis = 1)   
+
+        # corr = scipy.signal.correlate2d(gray1, gray2)
+
         ind = np.unravel_index(np.argmax(corr), corr.shape)
+
+        # plt.imshow(np.concatenate((corr1,corr), axis = 1))
+        # plt.show()
+        # plt.imshow(np.concatenate((gray1,gray2), axis = 1))
+        # plt.show()
+
 
         ind1 = ind[1]
         ind0 = ind[0]
@@ -122,8 +142,8 @@ def calculate(imgList1, imgList2):
         #     count += 1
 
         
-        print(code[i],'\t',test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test6(original1,original2),'\t',test.test7(temp,code[i],model))
-        # print(present[i],test.test5(original1,original2))
+        # print(code[i],'\t',test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test6(original1,original2),'\t',test.test7(temp,code[i],model))
+        print(present[i],test.test1(original1,original2))
         
         # if present[i] == 'NO':
 
