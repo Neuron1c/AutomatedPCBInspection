@@ -36,23 +36,36 @@ def main(imgName):
 
     mtx = np.load('mtx.npy')
     dist = np.load('dist.npy')
-
+    hyp = np.load('hyp.npy')
     h,  w = img.shape[:2]
     newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
 
+    print(mtx)
+    print(dist)
+    print(hyp)
     # undistort
+    height = (int)(img.shape[0]/1.1)
+    width = (int)(img.shape[1]/2)
+    img[:,:,:] = 255
+    img[height - 20: height + 20, width - 20: width + 20, :] = 0
+
     dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
 
+    dst[height - 20: height + 20, width - 20: width + 20, :] = 0
+
+    plt.imshow(dst)
+    plt.show()
     # crop the image
     x,y,w,h = roi
     dst = dst[y:y+h, x:x+w]
     # cv2.imwrite('calibresult.png',dst)
 
-    img = dst
+
+    # img = dst
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    ret, thresh = cv2.threshold(gray, 210, 255, cv2.THRESH_BINARY_INV)
+    ret, thresh = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)
     image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
     # plt.imshow(np.concatenate((thresh,gray), axis = 1))
@@ -75,8 +88,9 @@ def main(imgName):
 
     img = cropArea(img, rectangle)
 
-    box = cv2.boxPoints(rectangle)
-    box = np.int0(box)
+    # cv2.imwrite('pls.jpg', img)
+    # plt.imshow(img)
+    # plt.show()
 
     x, originX, originY = rotation.getRotation(img, 0)
 
@@ -84,8 +98,9 @@ def main(imgName):
         img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
     x, originX, originY = rotation.getRotation(img, 1)
-    # plt.imshow(img)
-    # plt.show()
+
+    
+
     imgList = locateComponents.locate(img, originX, originY)
     i = 0
 
@@ -101,9 +116,9 @@ def main(imgName):
     # plt.show()
 
 
-baseImgList = main('images/Golden/1.jpg')
-newImgList =  main('images/populated/6.jpg')
-correlate.calculate(baseImgList, newImgList)
+baseImgList = main('images/Golden/6.jpg')
+# newImgList =  main('images/populated/6.jpg')
+# correlate.calculate(baseImgList, newImgList)
 
 
 # import directoryFinder

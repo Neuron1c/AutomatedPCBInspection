@@ -15,7 +15,7 @@ objp[:,:2] = np.mgrid[0:x,0:y].T.reshape(-1,2)
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 
-images = glob.glob('chessboardDump/*.jpg')
+images = glob.glob('chessboardDump/9x7/*.jpg')
 
 # print(images)
 
@@ -96,5 +96,6 @@ hyp = hyp/count
 
 hyp = (hyp/10)*2
 
-np.save('hyp',hyp)
+# np.save('hyp',hyp)
+print(hyp)
 # cv2.imwrite('calibresult.png',dst)

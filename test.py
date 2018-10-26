@@ -13,7 +13,7 @@ import torch.nn.functional as F
 
 
 def test1(img1,img2): #SIMPLE COLOUR GRAB USING HSV
-    cv2.imwrite("pls.jpg", img2)
+    # cv2.imwrite("pls.jpg", img2)
 
     img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
     img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
@@ -62,7 +62,7 @@ def test1(img1,img2): #SIMPLE COLOUR GRAB USING HSV
     # print(np.round(B1 - B2))
     # print(np.round(G1 - G2))
 
-    print(R1 - R2, B1 - B2, G1 - G2)
+    # print(R1 - R2, B1 - B2, G1 - G2)
 
     if(R2 < R1 + 50 and R2 > R1 - 50):
         if(B2 < B1 + 30 and B2 > B1 - 30):
@@ -74,8 +74,10 @@ def test1(img1,img2): #SIMPLE COLOUR GRAB USING HSV
 
 def test2(img1,img2): #ATTEMPT TO DETECT SQUARE SOLDER PADS
 
-    lower = np.array([120, 120, 120], dtype = "uint8")
-    upper = np.array([255, 255, 255], dtype = "uint8")
+    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
+
+    lower = np.array([0, 0, 0], dtype = "uint8")
+    upper = np.array([255, 80, 255], dtype = "uint8")
     mask = cv2.inRange(img2, lower, upper)
 
     mask = np.pad(mask,((10,10),(10,10)),'constant',constant_values=((0, 0),(0,0)))

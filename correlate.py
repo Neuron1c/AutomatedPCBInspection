@@ -48,10 +48,12 @@ def calculate(imgList1, imgList2):
     mypath = 'trainingSet/2/'
     count = directoryFinder.getLastCount(mypath)
 
-    for i in range(len(imgList1)):
+    for i in range(1):
 
-        original1 = imgList1[i]
-        original2 = imgList2[i]
+        original1 = imgList1[i+2]
+        original2 = imgList2[i+2]
+
+        cv2.imwrite('pls.jpg', original2)
 
         img1 = cv2.cvtColor(original1, cv2.COLOR_BGR2GRAY).astype(np.float64)
         img2 = cv2.cvtColor(original2, cv2.COLOR_BGR2GRAY).astype(np.float64)
@@ -71,6 +73,11 @@ def calculate(imgList1, imgList2):
         corr = np.roll(corr, (corr.shape[0] - 1)//2, axis = 0)
         corr = np.roll(corr, (corr.shape[1] - 1)//2, axis = 1)   
 
+
+        # normalised = np.zeros(corr.shape)
+        # normalised = cv2.normalize(corr, normalised,0, 255, cv2.NORM_MINMAX)
+        # cv2.imwrite("pls.jpg", normalised)
+        
         # corr = scipy.signal.correlate2d(gray1, gray2)
 
         ind = np.unravel_index(np.argmax(corr), corr.shape)
@@ -126,10 +133,10 @@ def calculate(imgList1, imgList2):
         img1 = np.uint8(img1)
         img2 = np.uint8(img2)
 
-        # x = np.concatenate(original1,original2)
-        # plt.imshow(x)
+        # x = np.concatenate((original1,original2),axis = 1)
+        # plt.imshow(original2)
         # plt.show()
-        #
+        
         temp = original2[:]
 
         if(int(rotation[i]) == 90 or int(rotation[i]) == 270):
@@ -142,8 +149,8 @@ def calculate(imgList1, imgList2):
         #     count += 1
 
         
-        # print(code[i],'\t',test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test6(original1,original2),'\t',test.test7(temp,code[i],model))
-        print(present[i],test.test1(original1,original2))
+        print(code[i],'\t',test.test1(original1,original2), '\t',test.test2(original1,original2),'\t',test.test3(original1,original2),'\t',test.test6(original1,original2),'\t',test.test7(temp,code[i],model))
+        # print(present[i],test.test1(original1,original2))
         
         # if present[i] == 'NO':
 
